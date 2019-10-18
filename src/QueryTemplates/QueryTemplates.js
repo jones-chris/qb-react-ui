@@ -4,9 +4,8 @@ const QueryTemplates = (props) => {
     if (Object.keys(props).length === 0) {
         return null;
     } else {
-        let hiddenAsBoolean = (props.hidden === 'true');
         return (
-            <div id="queryTemplatesDiv" hidden={hiddenAsBoolean}>
+            <div id="queryTemplatesDiv" hidden={props.hidden === 'true'}>
                 <select id="queryTemplates">
                     <option value="test">test</option>
                 </select>

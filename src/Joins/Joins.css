@@ -1,0 +1,17 @@
+#joinsDiv {
+    clear: both;
+}
+
+#joinsDiv * {
+    margin: 2%;
+}
+
+#joinsDiv select {
+    width: 20%;
+}
+
+#joinsDiv image {
+    width: 20%;
+    height: 15%;
+}
+

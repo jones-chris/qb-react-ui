@@ -12,12 +12,6 @@ class MenuBar extends Component {
         joinsElementHidden: true
     };
 
-    constructor() {
-        super();
-        // this.toggleQueryTemplatesElementHandler = this.toggleQueryTemplatesElementHandler.bind(this);
-        this.queryTemplatesElement = React.createRef();
-    }
-
     toggleQueryTemplatesElementHandler = () => {
         let newState = Object.assign({}, this.state);
         for (let key in newState) {
@@ -27,19 +21,45 @@ class MenuBar extends Component {
         this.setState(newState);
     };
 
+    toggleSchemasAndTablesElementHandler = () => {
+        let newState = Object.assign({}, this.state);
+        for (let key in newState) {
+            newState[key] = true;
+        }
+        newState.schemasAndTablesElementHidden = false;
+        this.setState(newState);
+    };
+
+    toggleJoinsElementHandler = () => {
+        let newState = Object.assign({}, this.state);
+        for (let key in newState) {
+            newState[key] = true;
+        }
+        newState.joinsElementHidden = false;
+        this.setState(newState);
+    };
+
     render() {
         return (
             <div id="statementButtonsDiv" className="statement-buttons-div">
-                <button id="queryTemplatesButton" className="btn-primary qb-navbar-button" type="button"
+                <button id="queryTemplatesButton"
+                        className="btn-primary qb-navbar-button"
+                        type="button"
                         onClick={this.toggleQueryTemplatesElementHandler}>
                     Query Templates
                 </button>
 
-                <button id="schemasButton" className="btn-primary" type="button">
+                <button id="schemasButton"
+                        className="btn-primary"
+                        type="button"
+                        onClick={this.toggleSchemasAndTablesElementHandler}>
                     Schemas &amp; Tables
                 </button>
 
-                <button id="joinsButton" className="btn-primary" type="button">
+                <button id="joinsButton"
+                        className="btn-primary"
+                        type="button"
+                        onClick={this.toggleJoinsElementHandler}>
                     Joins
                 </button>
 
@@ -65,10 +85,9 @@ class MenuBar extends Component {
                     </button>
                 </div>
 
-                <QueryTemplates hidden={this.state.queryTemplatesElementHidden.toString()}></QueryTemplates>
-                <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}></SchemasAndTables>
-                <Joins hidden={this.state.joinsElementHidden.toString()}></Joins>
-
+                <QueryTemplates hidden={this.state.queryTemplatesElementHidden.toString()}/>
+                <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}/>
+                <Joins hidden={this.state.joinsElementHidden.toString()}/>
             </div>
         );
     }

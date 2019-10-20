@@ -68,12 +68,15 @@ class Joins extends Component {
             }
         }
 
-        let nextJoinType = this.joinImageUrls[0].name; // Default to first item in case of exception
-        let nextJoinImageUrl = this.joinImageUrls[0].image; // Default to first item in case of exception
+        let nextJoinType;
+        let nextJoinImageUrl;
         try {
             nextJoinType = this.joinImageUrls[currentJoinTypeIndex + 1].name;
             nextJoinImageUrl = this.joinImageUrls[currentJoinTypeIndex + 1].image;
-        } catch (e) {}
+        } catch (e) {
+            nextJoinType = this.joinImageUrls[0].name; // Default to first item in case of index out of range exception.
+            nextJoinImageUrl = this.joinImageUrls[0].image; // Default to first item in case of index out of range exception.
+        }
 
         // Copy state
         let newState = Object.assign({}, this.state);

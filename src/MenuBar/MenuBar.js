@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import './MenuBar.css'
-import QueryTemplates from '../QueryTemplates/QueryTemplates'
-import SchemasAndTables from '../SchemasAndTables/SchemasAndTables'
-import Joins from '../Joins/Joins'
+import './MenuBar.css';
+import QueryTemplates from '../QueryTemplates/QueryTemplates';
+import SchemasAndTables from '../SchemasAndTables/SchemasAndTables';
+import Joins from '../Joins/Joins';
+import OtherOptions from '../OtherOptions/OtherOptions';
 
 class MenuBar extends Component {
 
     state = {
         queryTemplatesElementHidden: true,
         schemasAndTablesElementHidden: false,
-        joinsElementHidden: true
+        joinsElementHidden: true,
+        otherOptionsElementHidden: true
     };
 
     toggleQueryTemplatesElementHandler = () => {
@@ -36,6 +38,15 @@ class MenuBar extends Component {
             newState[key] = true;
         }
         newState.joinsElementHidden = false;
+        this.setState(newState);
+    };
+
+    toggleOtherOptionsElementHandler = () => {
+        let newState = Object.assign({}, this.state);
+        for (let key in newState) {
+            newState[key] = true;
+        }
+        newState.otherOptionsElementHidden = false;
         this.setState(newState);
     };
 
@@ -71,7 +82,10 @@ class MenuBar extends Component {
                     Criteria
                 </button>
 
-                <button id="otherOptionsButton" className="btn-primary" type="button">
+                <button id="otherOptionsButton"
+                        className="btn-primary"
+                        type="button"
+                        onClick={this.toggleOtherOptionsElementHandler}>
                     Other Options
                 </button>
 
@@ -88,6 +102,7 @@ class MenuBar extends Component {
                 <QueryTemplates hidden={this.state.queryTemplatesElementHidden.toString()}/>
                 <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}/>
                 <Joins hidden={this.state.joinsElementHidden.toString()}/>
+                <OtherOptions hidden={this.state.otherOptionsElementHidden.toString()}></OtherOptions>
             </div>
         );
     }

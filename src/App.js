@@ -1,15 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
-import MenuBar from './MenuBar/MenuBar'
+import MenuBar from './MenuBar/MenuBar';
+import { Provider } from 'unstated';
 
-class App extends Component {
-    render() {
-        return (
+
+const App = () => {
+    return (
+        <Provider>
+            {/*<QueryState/>*/}
             <div className="App">
                 <MenuBar></MenuBar>
             </div>
-        );
-    }
-}
+        </Provider>
+    );
+};
 
 export default App;

@@ -14,7 +14,6 @@ class SchemasAndTables extends Component {
             selectedTables: []
         };
 
-        // todo:  Add bindings here
         this.handleChange.bind(this);
     }
 
@@ -23,6 +22,14 @@ class SchemasAndTables extends Component {
     }
 
     render() {
+        // Create JSX list of all available schemas so that it can be used when rendering.
+        const availableSchemas = [];
+        this.props.availableSchemas.forEach(schema => {
+            availableSchemas.push(
+                <option key={`${schema.databaseName}.${schema.schemaName}`} value={schema.schemaName}>{schema.schemaName}</option>
+            )
+        });
+
         return (
             <div>
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
@@ -30,7 +37,7 @@ class SchemasAndTables extends Component {
                     <select id="schemas" size="30" multiple={true}
                             onChange={this.props.selectHandler}
                     >
-                        <option value="null">null</option>
+                        {availableSchemas}
                     </select>
                 </div>
 

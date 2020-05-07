@@ -15,25 +15,58 @@ class MenuBar extends Component {
         joinsElementHidden: true,
         otherOptionsElementHidden: true,
         availableSchemas: [],
-        selectedSchemas: []
+        selectedSchemas: [],
+        isFetchingData: true
     };
 
     constructor() {
         super();
 
-        // Get available schemas.
-        this.getAvailableSchemas();
+        // // Get available schemas.
+        // this.getAvailableSchemas()
+        //     .then(schemas => {
+        //         let newState = Object.assign({}, this.state);
+        //         newState.availableSchemas = schemas;
+        //         newState.isFetchingData = false;
+        //         this.setState(newState);
+        //     });
+
+        fetch('http://localhost:8080/metadata/querybuilder4j/schema')
+            .then(response => response.json())
+            .then(schemas => {
+                console.log(schemas);
+
+                let newState = Object.assign({}, this.state);
+                newState.availableSchemas = schemas;
+                newState.isFetchingData = false;
+                this.setState(newState);
+            });
 
         // Bind methods to this class that are passed to child components.
         this.updateSelectedSchemas.bind(this);
     }
 
-    async getAvailableSchemas() {
-        await fetch('http://localhost:8080/metadata/querybuilder4j/schema')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.log(error));
-    }
+    // componentDidMount() {
+    //     // Get available schemas.
+    //     this.getAvailableSchemas()
+    //         .then(schemas => {
+    //             console.log(schemas);
+    //
+    //             let newState = Object.assign({}, this.state);
+    //             newState.availableSchemas = schemas;
+    //             newState.isFetchingData = false;
+    //             this.setState(newState);
+    //         });
+    // }
+    //
+    // async getAvailableSchemas() {
+    //     try {
+    //         const response = await fetch('http://localhost:8080/metadata/querybuilder4j/schema');
+    //         return response.json();
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
 
     toggleQueryTemplatesElementHandler = () => {
         let newState = Object.assign({}, this.state);
@@ -89,6 +122,10 @@ class MenuBar extends Component {
     };
 
     render() {
+        if (this.state.isFetchingData) {
+            return <p>Fetching data...</p>
+        }
+
         return (
             <div id="statementButtonsDiv" className="statement-buttons-div">
                 <button id="queryTemplatesButton"
@@ -139,7 +176,8 @@ class MenuBar extends Component {
 
                 <QueryTemplates hidden={this.state.queryTemplatesElementHidden.toString()}/>
                 <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}
-                    selectHandler={this.updateSelectedSchemas}
+                                  availableSchemas={this.state.availableSchemas}
+                                  selectHandler={this.updateSelectedSchemas}
                 />
                 <Joins hidden={this.state.joinsElementHidden.toString()}/>
                 <OtherOptions hidden={this.state.otherOptionsElementHidden.toString()}></OtherOptions>

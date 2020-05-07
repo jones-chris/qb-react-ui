@@ -1,17 +1,19 @@
 import React from 'react';
 import './App.css';
 import MenuBar from './MenuBar/MenuBar';
-import { Provider } from 'unstated';
+import QueryState from "./State/QueryState";
 
 
 const App = () => {
+    this.state = {
+        availableSchemas: [],
+        selectedSchemas: []
+    };
+
     return (
-        <Provider>
-            {/*<QueryState/>*/}
-            <div className="App">
-                <MenuBar></MenuBar>
-            </div>
-        </Provider>
+        <div className="App">
+            <MenuBar></MenuBar>
+        </div>
     );
 };
 

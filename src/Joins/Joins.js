@@ -33,7 +33,11 @@ class Joins extends Component {
             'key': newState.joins.length,
             'id': newState.joins.length,
             'joinType': this.joinImageUrls[0].name,
-            'joinImageUrl': this.joinImageUrls[0].image
+            'joinImageUrl': this.joinImageUrls[0].image,
+            'parentTable': '',
+            'targetTable': '',
+            'parentJoinColumns': [],
+            'targetJoinColumns': []
         });
         this.setState(newState);
     };

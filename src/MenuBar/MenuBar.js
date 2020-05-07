@@ -4,6 +4,8 @@ import QueryTemplates from '../QueryTemplates/QueryTemplates';
 import SchemasAndTables from '../SchemasAndTables/SchemasAndTables';
 import Joins from '../Joins/Joins';
 import OtherOptions from '../OtherOptions/OtherOptions';
+import MetadataService from '../Services/MetadataService';
+
 
 class MenuBar extends Component {
 
@@ -11,8 +13,27 @@ class MenuBar extends Component {
         queryTemplatesElementHidden: true,
         schemasAndTablesElementHidden: false,
         joinsElementHidden: true,
-        otherOptionsElementHidden: true
+        otherOptionsElementHidden: true,
+        availableSchemas: [],
+        selectedSchemas: []
     };
+
+    constructor() {
+        super();
+
+        // Get available schemas.
+        this.getAvailableSchemas();
+
+        // Bind methods to this class that are passed to child components.
+        this.updateSelectedSchemas.bind(this);
+    }
+
+    async getAvailableSchemas() {
+        await fetch('http://localhost:8080/metadata/querybuilder4j/schema')
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.log(error));
+    }
 
     toggleQueryTemplatesElementHandler = () => {
         let newState = Object.assign({}, this.state);
@@ -47,6 +68,23 @@ class MenuBar extends Component {
             newState[key] = true;
         }
         newState.otherOptionsElementHidden = false;
+        this.setState(newState);
+    };
+
+    updateSelectedSchemas = (event) => {
+        const selectElement = event.target;
+        const options = selectElement.options;
+
+        let newSelectedSchemas = [];
+        for (let i=0; i<options.length; i++) {
+            let option = options[i];
+            if (option.selected) {
+                newSelectedSchemas.push(option.value);
+            }
+        }
+
+        let newState = Object.assign({}, this.state);
+        newState.selectedSchemas = newSelectedSchemas;
         this.setState(newState);
     };
 
@@ -100,7 +138,9 @@ class MenuBar extends Component {
                 </div>
 
                 <QueryTemplates hidden={this.state.queryTemplatesElementHidden.toString()}/>
-                <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}/>
+                <SchemasAndTables hidden={this.state.schemasAndTablesElementHidden.toString()}
+                    selectHandler={this.updateSelectedSchemas}
+                />
                 <Joins hidden={this.state.joinsElementHidden.toString()}/>
                 <OtherOptions hidden={this.state.otherOptionsElementHidden.toString()}></OtherOptions>
             </div>

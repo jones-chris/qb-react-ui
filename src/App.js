@@ -12,7 +12,8 @@ const App = () => {
 
     return (
         <div className="App">
-            <MenuBar></MenuBar>
+            {/*<MenuBar></MenuBar>*/}
+            <QueryState></QueryState>
         </div>
     );
 };

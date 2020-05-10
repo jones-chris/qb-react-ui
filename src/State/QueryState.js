@@ -5,6 +5,7 @@ import Joins from "../Joins/Joins";
 import OtherOptions from "../OtherOptions/OtherOptions";
 import * as Constants from '../Config/Constants';
 import Columns from "../Columns/Columns";
+import * as Utils from '../Utils/Utils';
 
 class QueryState extends Component {
 
@@ -25,13 +26,15 @@ class QueryState extends Component {
             selectedSchemas: [],
             availableTables: [],
             selectedTables: [],
-            availableColumns: []
+            availableColumns: [],
+            selectedColumns: []
         };
 
         // Bind handlers to `this` context.
         this.updateSelectedSchemas.bind(this);
         this.updateSelectedTables.bind(this);
         this.toggleJoinsElementHandler.bind(this);
+        this.updateSelectedColumns.bind(this);
     }
 
     componentDidMount() {
@@ -51,16 +54,7 @@ class QueryState extends Component {
     updateSelectedSchemas = (event) => {
         // First, update state's selectedSchemas.
         const selectElement = event.target;
-        const options = selectElement.options;
-
-        let newSelectedSchemas = [];
-        for (let i=0; i<options.length; i++) {
-            let option = options[i];
-            if (option.selected) {
-                newSelectedSchemas.push(option.value);
-            }
-        }
-
+        let newSelectedSchemas = Utils.getSelectedOptions(selectElement);
         this.setState({ selectedSchemas: newSelectedSchemas });
 
         // Second, get available tables for the selected schemas.
@@ -71,16 +65,7 @@ class QueryState extends Component {
     updateSelectedTables = (event) => {
         // First, update state's selectedTables.
         const selectElement = event.target;
-        const options = selectElement.options;
-
-        let newSelectedTables = [];
-        for (let i=0; i<options.length; i++) {
-            let option = options[i];
-            if (option.selected) {
-                newSelectedTables.push(option.value);
-            }
-        }
-
+        let newSelectedTables = Utils.getSelectedOptions(selectElement);
         this.setState({selectedTables: newSelectedTables});
 
         // Second, get available columns for selected tables.
@@ -117,6 +102,19 @@ class QueryState extends Component {
                 this.setState(newState);
             });
     }
+
+    updateSelectedColumns = (event) => {
+        // const selectElement = event.target;
+        // let newSelectedColumns = Utils.getSelectedOptions(selectElement);
+        let newSelectedColumnsFullyQualifiedNames = Utils.getSelectedOptions(document.getElementById('availableColumns'));
+
+        // Get the column JSON object based on newSelectedColumns, which is an array of the column fullyQualifiedNames.
+        let newSelectedColumns = this.state.availableColumns.filter(column => {
+            return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
+        });
+
+        this.setState({selectedColumns: newSelectedColumns});
+    };
 
     toggleJoinsElementHandler = (elementToShow) => {
         // Copy state.
@@ -175,6 +173,8 @@ class QueryState extends Component {
                 <Columns
                     hidden={this.state.elementsVisibility.columnsElementHidden.toString()}
                     availableColumns={this.state.availableColumns}
+                    selectColumnsHandler={this.updateSelectedColumns}
+                    selectedColumns={this.state.selectedColumns}
                 >
                 </Columns>
             </div>

@@ -30,4 +30,19 @@ export function getJdbcSqlType(jdbcSqlTypeInt) {
     else if (jdbcSqlTypeInt === -15) { return 'nchar' }
     else if (jdbcSqlTypeInt === -15) { return 'nchar' }
     else if (jdbcSqlTypeInt === -15) { return 'nchar' }
+    else { console.log('Did not recognize sql type') }
+}
+
+export function getSelectedOptions(selectElement) {
+    const options = selectElement.options;
+
+    let selectedOptions = [];
+    for (let i=0; i<options.length; i++) {
+        let option = options[i];
+        if (option.selected) {
+            selectedOptions.push(option.value);
+        }
+    }
+
+    return selectedOptions;
 }

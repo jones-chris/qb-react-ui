@@ -30,11 +30,21 @@ class SchemasAndTables extends Component {
             )
         });
 
+        // Create JSX list of all available tables so that it can be used when rendering.
+        const availableTables = [];
+        if (this.props.availableTables) {
+            this.props.availableTables.forEach(table => {
+                availableTables.push(
+                    <option key={`${table.databaseName}.${table.schemaName}.${table.tableName}`} value={table.tableName}>{table.tableName}</option>
+                );
+            })
+        }
+
         return (
             <div>
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="schemas">Schemas</label>
-                    <select id="schemas" size="30" multiple={true}
+                    <select id="schemas" size="30" multiple={false}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
                             onChange={this.props.selectHandler}
                     >
                         {availableSchemas}
@@ -44,6 +54,7 @@ class SchemasAndTables extends Component {
                 <div id="tablesDiv" className="tables-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="table">Tables</label>
                     <select id="table" name="table" multiple={true} size="30">
+                        {availableTables}
                     </select>
                 </div>
             </div>

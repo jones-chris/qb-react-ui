@@ -19,14 +19,17 @@ class QueryState extends Component {
                 criteriaElementHidden: true,
                 otherOptionsElementHidden: true
             },
-            isFetchingData: true,
+            isLoading: true,
             availableSchemas: [],
             selectedSchemas: [],
-            availableTables: []
+            availableTables: [],
+            selectedTables: [],
+            availableColumns: []
         };
 
         // Bind handlers to `this` context.
         this.updateSelectedSchemas.bind(this);
+        this.updateSelectedTables.bind(this);
         this.toggleJoinsElementHandler.bind(this);
     }
 
@@ -39,7 +42,7 @@ class QueryState extends Component {
 
                 let newState = Object.assign({}, this.state);
                 newState.availableSchemas = schemas;
-                newState.isFetchingData = false;
+                newState.isLoading = false;
                 this.setState(newState);
             });
     }
@@ -57,17 +60,35 @@ class QueryState extends Component {
             }
         }
 
-        let newState = Object.assign({}, this.state);
-        newState.selectedSchemas = newSelectedSchemas;
-        this.setState(newState);
+        this.setState({ selectedSchemas: newSelectedSchemas });
 
         // Second, get available tables for the selected schemas.
         // todo:  this is hard coded to the 0th selected schema because multiple schemas are not supported in the API yet.
         this.getAvailableTables(newSelectedSchemas[0])
     };
 
+    updateSelectedTables = (event) => {
+        // First, update state's selectedTables.
+        const selectElement = event.target;
+        const options = selectElement.options;
+
+        let newSelectedTables = [];
+        for (let i=0; i<options.length; i++) {
+            let option = options[i];
+            if (option.selected) {
+                newSelectedTables.push(option.value);
+            }
+        }
+
+        this.setState({selectedTables: newSelectedTables});
+
+        // Second, get available columns for selected tables.
+        // todo:  this is hard coded to the 0th selected schema because multiple schemas are not supported in the API yet.
+        this.getAvailableColumns(this.state.selectedSchemas[0], newSelectedTables);
+    };
+
     getAvailableTables(schemaName) {
-        this.setState({isFetchingData: true});
+        this.setState({ isLoading: true });
 
         fetch(`http://localhost:8080/metadata/querybuilder4j/${schemaName}/table-and-view`)
             .then(response => response.json())
@@ -76,7 +97,22 @@ class QueryState extends Component {
 
                 let newState = Object.assign({}, this.state);
                 newState.availableTables = tables;
-                newState.isFetchingData = false;
+                newState.isLoading = false;
+                this.setState(newState);
+            });
+    }
+
+    getAvailableColumns(schemaName, tables) {
+        this.setState({ isLoading: true });
+
+        fetch(`http://localhost:8080/metadata/querybuilder4j/${schemaName}/${tables.join('&')}/column`)
+            .then(response => response.json())
+            .then(columns => {
+                console.log(columns);
+
+                let newState = Object.assign({}, this.state);
+                newState.availableColumns = columns;
+                newState.isLoading = false;
                 this.setState(newState);
             });
     }
@@ -101,6 +137,14 @@ class QueryState extends Component {
     };
 
     render() {
+        if (this.state.isLoading) {
+            return (
+                <div>
+                    <p>Loading...</p>
+                </div>
+            )
+        }
+
         return (
             <div>
                 <MenuBar
@@ -121,8 +165,9 @@ class QueryState extends Component {
                 <SchemasAndTables
                     hidden={this.state.elementsVisibility.schemasAndTablesElementHidden.toString()}
                     availableSchemas={this.state.availableSchemas}
-                    selectHandler={this.updateSelectedSchemas}
+                    selectSchemasHandler={this.updateSelectedSchemas}
                     availableTables={this.state.availableTables}
+                    selectTablesHandler={this.updateSelectedTables}
                 >
                 </SchemasAndTables>
             </div>

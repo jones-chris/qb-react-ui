@@ -4,6 +4,7 @@ import SchemasAndTables from "../SchemasAndTables/SchemasAndTables";
 import Joins from "../Joins/Joins";
 import OtherOptions from "../OtherOptions/OtherOptions";
 import * as Constants from '../Config/Constants';
+import Columns from "../Columns/Columns";
 
 class QueryState extends Component {
 
@@ -170,6 +171,12 @@ class QueryState extends Component {
                     selectTablesHandler={this.updateSelectedTables}
                 >
                 </SchemasAndTables>
+
+                <Columns
+                    hidden={this.state.elementsVisibility.columnsElementHidden.toString()}
+                    availableColumns={this.state.availableColumns}
+                >
+                </Columns>
             </div>
         );
     }

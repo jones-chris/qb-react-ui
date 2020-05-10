@@ -1,0 +1,42 @@
+.table-columns {
+    margin: auto;
+    text-align: center;
+    display: inline-block;
+}
+
+.available-columns-buttons-div {
+    padding-top: 70px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+}
+
+#addRemoveColumns {
+    float: left;
+    width: 10%;
+}
+
+#addRemoveColumns * {
+    margin-top: 20px;
+}
+
+#availableColumnsDiv {
+    float: left;
+    display: grid;
+    width: 300px;
+    padding-left: 5%;
+}
+
+#availableColumns {
+    overflow-x: auto;
+}
+
+#selectedColumnsDiv {
+    float: left;
+    width: 300px;
+    display: grid;
+}
+
+#selectedColumns {
+    width: 200px;
+}

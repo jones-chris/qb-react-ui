@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
 import './MenuBar.css';
-import QueryTemplates from '../QueryTemplates/QueryTemplates';
-import SchemasAndTables from '../SchemasAndTables/SchemasAndTables';
-import Joins from '../Joins/Joins';
-import OtherOptions from '../OtherOptions/OtherOptions';
-import MetadataService from '../Services/MetadataService';
 import * as Constants from '../Config/Constants';
 
 
@@ -40,42 +35,6 @@ class MenuBar extends Component {
         // Bind methods to this class that are passed to child components.
         this.updateSelectedSchemas.bind(this);
     }
-
-    toggleQueryTemplatesElementHandler = () => {
-        let newState = Object.assign({}, this.state);
-        for (let key in newState) {
-            newState[key] = true;
-        }
-        newState.queryTemplatesElementHidden = false;
-        this.setState(newState);
-    };
-
-    toggleSchemasAndTablesElementHandler = () => {
-        let newState = Object.assign({}, this.state);
-        for (let key in newState) {
-            newState[key] = true;
-        }
-        newState.schemasAndTablesElementHidden = false;
-        this.setState(newState);
-    };
-
-    // toggleJoinsElementHandler = () => {
-    //     let newState = Object.assign({}, this.state);
-    //     for (let key in newState) {
-    //         newState[key] = true;
-    //     }
-    //     newState.joinsElementHidden = false;
-    //     this.setState(newState);
-    // };
-
-    toggleOtherOptionsElementHandler = () => {
-        let newState = Object.assign({}, this.state);
-        for (let key in newState) {
-            newState[key] = true;
-        }
-        newState.otherOptionsElementHidden = false;
-        this.setState(newState);
-    };
 
     updateSelectedSchemas = (event) => {
         const selectElement = event.target;
@@ -123,34 +82,42 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}>
-                            <a className="nav-link" href="#">Schemas &amp; Tables <span className="sr-only">(current)</span></a>
+                        <li className={this.state.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.SCHEMAS_AND_TABLES)}
+                        >
+                            <a className="nav-link" href="#">{Constants.SCHEMAS_AND_TABLES} <span className="sr-only">(current)</span></a>
                         </li>
 
                         <hr className="divider"/>
 
                         <li className={this.state.joinsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleJoinsElementHandler(Constants.JOINS)}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.JOINS)}
                         >
                             <a className="nav-link" href="#">{Constants.JOINS} <span className="sr-only">(current)</span></a>
                         </li>
 
                         <hr className="divider"/>
 
-                        <li className={this.state.columnsElementHidden ? "nav-item" : "nav-item active"}>
-                            <a className="nav-link" href="#">Columns <span className="sr-only">(current)</span></a>
+                        <li className={this.state.columnsElementHidden ? "nav-item" : "nav-item active"}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.COLUMNS)}
+                        >
+                            <a className="nav-link" href="#">{Constants.COLUMNS} <span className="sr-only">(current)</span></a>
                         </li>
 
                         <hr className="divider"/>
 
-                        <li className={this.state.criteriaElementHidden ? "nav-item" : "nav-item active"}>
-                            <a className="nav-link" href="#">Criteria <span className="sr-only">(current)</span></a>
+                        <li className={this.state.criteriaElementHidden ? "nav-item" : "nav-item active"}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.CRITERIA)}
+                        >
+                            <a className="nav-link" href="#">{Constants.CRITERIA} <span className="sr-only">(current)</span></a>
                         </li>
 
                         <hr className="divider"/>
 
-                        <li className={this.state.otherOptionsElementHidden ? "nav-item" : "nav-item active"}>
-                            <a className="nav-link" href="#">Other Options <span className="sr-only">(current)</span></a>
+                        <li className={this.state.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.OTHER_OPTIONS)}
+                        >
+                            <a className="nav-link" href="#">{Constants.OTHER_OPTIONS} <span className="sr-only">(current)</span></a>
                         </li>
 
                     </ul>

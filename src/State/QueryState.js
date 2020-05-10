@@ -30,15 +30,20 @@ class QueryState extends Component {
     }
 
     toggleJoinsElementHandler = (elementToShow) => {
+        // Copy state.
         let newState = Object.assign({}, this.state);
 
-        // Set all elements' visbibility to true (hidden).
+        // Set all elements' visibility to true (hidden).
         for (let key in newState.elementsVisibility) {
             newState.elementsVisibility[key] = true;
         }
 
         // Set the elementToShow's visibility to false (visible/not hidden).
         if (elementToShow === Constants.JOINS) { newState.elementsVisibility.joinsElementHidden = false; }
+        else if (elementToShow === Constants.SCHEMAS_AND_TABLES) { newState.elementsVisibility.schemasAndTablesElementHidden = false; }
+        else if (elementToShow === Constants.COLUMNS) { newState.elementsVisibility.columnsElementHidden = false; }
+        else if (elementToShow === Constants.CRITERIA) { newState.elementsVisibility.criteriaElementHidden = false; }
+        else if (elementToShow === Constants.OTHER_OPTIONS) { newState.elementsVisibility.otherOptionsElementHidden = false; }
 
         this.setState(newState);
     };
@@ -46,7 +51,7 @@ class QueryState extends Component {
     render() {
         return (
             <div>
-                <MenuBar toggleJoinsElementHandler={this.toggleJoinsElementHandler}
+                <MenuBar toggleElementVisibilityHandler={this.toggleJoinsElementHandler}
                 >
                 </MenuBar>
                 <Joins hidden={this.state.elementsVisibility.joinsElementHidden.toString()}></Joins>

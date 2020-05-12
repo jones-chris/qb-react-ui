@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Joins.css'
+import * as Constants from '../Config/Constants';
 
 
 class Joins extends Component {
@@ -12,11 +13,67 @@ class Joins extends Component {
         super(props);
     }
 
+    isJoinParentTable(fullyQualifiedTableName) {
+        for (let i=0; i<this.props.joins.length; i++) {
+            let join = this.props.joins[i];
+            if (join.parentTable.fullyQualifiedName === fullyQualifiedTableName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    isJoinTargetTable(fullyQualifiedTableName) {
+        for (let i=0; i<this.props.joins.length; i++) {
+            let join = this.props.joins[i];
+            if (join.targetTable.fullyQualifiedName === fullyQualifiedTableName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    isTableSelected(fullyQualifiedTableName, parentOrTarget) {
+        if (this.props.joins.length === 0) {
+            return false;
+        }
+
+        for (let i=0; i<this.props.joins.length; i++) {
+            let join = this.props.joins[i];
+            if (parentOrTarget === Constants.PARENT) {
+                if (join.parentTable.fullyQualifiedName === fullyQualifiedTableName) {
+                    return true;
+                }
+            } else if (parentOrTarget === Constants.TARGET) {
+                if (join.targetTable.fullyQualifiedName === fullyQualifiedTableName) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     render() {
-        // Create available tables JSX.
-        const availableTables = this.props.availableTables.map(table => {
+        // Create available tables JSX for parent table select element.
+        const availableTablesParentTableOptions = this.props.availableTables.map(table => {
             return <option key={table.fullyQualifiedName}
                            value={table.fullyQualifiedName}
+                           // selected={this.isJoinParentTable(table.fullyQualifiedName)}
+                           selected={this.isTableSelected(table.fullyQualifiedName, Constants.PARENT)}
+            >
+                {table.tableName}
+            </option>
+        });
+
+        // Create available tables JSX for target table select element.
+        const availableTablesTargetTableOptions = this.props.availableTables.map(table => {
+            return <option key={table.fullyQualifiedName}
+                           value={table.fullyQualifiedName}
+                           // selected={this.isJoinTargetTable(table.fullyQualifiedName)}
+                           selected={this.isTableSelected(table.fullyQualifiedName, Constants.TARGET)}
             >
                 {table.tableName}
             </option>
@@ -41,8 +98,10 @@ class Joins extends Component {
 
                 <input id={`joins${join.id}.joinType`} hidden defaultValue={join.joinType}/>
 
-                <select id={`joins${join.id}.parentTable`}>
-                    {availableTables}
+                <select id={`joins${join.id}.parentTable`}
+                        onChange={(event) => this.props.onJoinTableChangeHandler(join.id, event, Constants.PARENT)}
+                >
+                    {availableTablesParentTableOptions}
                 </select>
 
                 <img id={`joins-image-${join.id}`}
@@ -50,8 +109,10 @@ class Joins extends Component {
                      src={join.joinImageUrl}
                      onClick={() => this.props.onJoinImageClickHandler(join.id)}/>
 
-                <select id={`joins${join.id}.targetTable`}>
-                    {availableTables}
+                <select id={`joins${join.id}.targetTable`}
+                        onChange={(event) => this.props.onJoinTableChangeHandler(join.id, event, Constants.TARGET)}
+                >
+                    {availableTablesTargetTableOptions}
                 </select>
 
                 <div>

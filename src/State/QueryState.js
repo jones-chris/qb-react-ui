@@ -48,6 +48,7 @@ class QueryState extends Component {
         this.onAddJoinClickHandler.bind(this);
         this.onDeleteJoinHandler.bind(this);
         this.onJoinImageClickHandler.bind(this);
+        this.onJoinTableChangeHandler.bind(this);
     }
 
     componentDidMount() {
@@ -133,7 +134,7 @@ class QueryState extends Component {
 
             let newSelectedColumns = this.state.selectedColumns.filter(column => {
                 return ! fullyQualifiedColumnsNamesToRemove.includes(column.fullyQualifiedName);
-            })
+            });
 
             this.setState({selectedColumns: newSelectedColumns})
         }
@@ -232,6 +233,37 @@ class QueryState extends Component {
         this.setState(newState);
     };
 
+    onJoinTableChangeHandler = (joinId, event, parentOrTarget) => {
+        //     let parentTableName = Utils.getSelectedOptions(event.target)[0];
+        //     let parentTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === parentTableName; })[0];
+        //
+        //     let newJoins = Object.assign([], this.state.joins);
+        //
+        //     newJoins.forEach(join => {
+        //         if (join.id === joinId) {
+        //             join.parentTable = parentTableObject;
+        //         }
+        //     });
+        //
+        //     this.setState({joins: newJoins});
+        let tableName = Utils.getSelectedOptions(event.target)[0];
+        let tableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === tableName; })[0];
+
+        let newJoins = Object.assign([], this.state.joins);
+
+        newJoins.forEach(join => {
+            if (join.id === joinId) {
+                if (parentOrTarget === Constants.PARENT) {
+                    join.parentTable = tableObject;
+                } else if (parentOrTarget === Constants.TARGET) {
+                    join.targetTable = tableObject;
+                }
+            }
+        });
+
+        this.setState({joins: newJoins});
+    };
+
     toggleJoinsElementHandler = (elementToShow) => {
         // Copy state.
         let newState = Object.assign({}, this.state);
@@ -275,6 +307,7 @@ class QueryState extends Component {
                     onAddJoinClickHandler={this.onAddJoinClickHandler}
                     onDeleteJoinHandler={this.onDeleteJoinHandler}
                     onJoinImageClickHandler={this.onJoinImageClickHandler}
+                    onJoinTableChangeHandler={this.onJoinTableChangeHandler}
                 >
                 </Joins>
 

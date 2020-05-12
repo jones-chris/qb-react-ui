@@ -41,3 +41,7 @@ export const JOIN_IMAGES = [
 // Adding and removing columns.
 export const ADD = 'add';
 export const REMOVE = 'remove';
+
+// Join parent and target constants.
+export const PARENT = 'parent';
+export const TARGET = 'target';

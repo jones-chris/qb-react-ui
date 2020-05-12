@@ -27,7 +27,12 @@ class QueryState extends Component {
             availableTables: [],
             selectedTables: [],
             availableColumns: [],
-            selectedColumns: []
+            selectedColumns: [],
+            joins: [],
+            distinct: false,
+            suppressNulls: false,
+            limit: 10,
+            offset: 0
         };
 
         // Bind handlers to `this` context.
@@ -35,6 +40,14 @@ class QueryState extends Component {
         this.updateSelectedTables.bind(this);
         this.toggleJoinsElementHandler.bind(this);
         this.updateSelectedColumns.bind(this);
+        this.updateDistinct.bind(this);
+        this.updateSuppressNulls.bind(this);
+        this.updateLimit.bind(this);
+        this.updateOffset.bind(this);
+        // this.shareState.bind(this);
+        this.onAddJoinClickHandler.bind(this);
+        this.onDeleteJoinHandler.bind(this);
+        this.onJoinImageClickHandler.bind(this);
     }
 
     componentDidMount() {
@@ -63,6 +76,8 @@ class QueryState extends Component {
     };
 
     updateSelectedTables = (event) => {
+        console.log(this.state);
+
         // First, update state's selectedTables.
         const selectElement = event.target;
         let newSelectedTables = Utils.getSelectedOptions(selectElement);
@@ -103,17 +118,118 @@ class QueryState extends Component {
             });
     }
 
-    updateSelectedColumns = (event) => {
-        // const selectElement = event.target;
-        // let newSelectedColumns = Utils.getSelectedOptions(selectElement);
-        let newSelectedColumnsFullyQualifiedNames = Utils.getSelectedOptions(document.getElementById('availableColumns'));
+    updateSelectedColumns = (action) => {
+        if (action === Constants.ADD) {
+            let newSelectedColumnsFullyQualifiedNames = Utils.getSelectedOptions(document.getElementById('availableColumns'));
 
-        // Get the column JSON object based on newSelectedColumns, which is an array of the column fullyQualifiedNames.
-        let newSelectedColumns = this.state.availableColumns.filter(column => {
-            return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
+            // Get the column JSON object based on newSelectedColumns, which is an array of the column fullyQualifiedNames.
+            let newSelectedColumns = this.state.availableColumns.filter(column => {
+                return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
+            });
+
+            this.setState({selectedColumns: newSelectedColumns});
+        } else if (action === Constants.REMOVE) {
+            let fullyQualifiedColumnsNamesToRemove = Utils.getSelectedOptions(document.getElementById('columns'));
+
+            let newSelectedColumns = this.state.selectedColumns.filter(column => {
+                return ! fullyQualifiedColumnsNamesToRemove.includes(column.fullyQualifiedName);
+            })
+
+            this.setState({selectedColumns: newSelectedColumns})
+        }
+
+    };
+
+    updateDistinct = (isDistinct) => {
+        this.setState({distinct: isDistinct});
+    };
+
+    updateSuppressNulls = (isSuppressNulls) => {
+        this.setState({suppressNulls: isSuppressNulls})
+    };
+
+    updateLimit = (newLimit) => {
+        this.setState({limit: newLimit});
+    };
+
+    updateOffset = (newOffset) => {
+        this.setState({offset: newOffset});
+    };
+
+    // shareState = (stateAttribute, newState) => {
+    //     console.log(this.state);
+    //
+    //     if (stateAttribute === Constants.SELECTED_TABLES_STATE) { this.setState({selectedTables: newState}); }
+    //     else if (stateAttribute === Constants.SELECTED_COLUMNS_STATE) { this.setState({selectedColumns: newState}); }
+    //     else if (stateAttribute === Constants.JOINS_STATE) { this.setState({joins: newState}); }
+    //     else if (stateAttribute === Constants.DISTINCT_STATE) { this.setState({distinct: newState}); }
+    // };
+
+    onAddJoinClickHandler = () => {
+        let newState = Object.assign({}, this.state);
+        newState.joins.push({
+            'key': newState.joins.length,
+            'id': newState.joins.length,
+            'joinType': Constants.JOIN_IMAGES[0].name,
+            'joinImageUrl': Constants.JOIN_IMAGES[0].image,
+            'parentTable': '',
+            'targetTable': '',
+            'parentJoinColumns': [],
+            'targetJoinColumns': []
         });
 
-        this.setState({selectedColumns: newSelectedColumns});
+        this.setState(newState);
+    };
+
+    onDeleteJoinHandler = (joinId) => {
+        joinId = parseInt(joinId);
+
+        // Create new array of joins that excludes the id being deleted.
+        let newState = Object.assign({}, this.state);
+        newState.joins = newState.joins.filter(join => join.id !== joinId);
+
+        // Renumber join ids.
+        for (let i=0; i<newState.joins.length; i++) {
+            newState.joins[i].id = i;
+        }
+
+        this.setState(newState);
+    };
+
+    onJoinImageClickHandler = (joinId) => {
+        // Get next join image based on currentJoinType.
+        joinId = parseInt(joinId);
+        let currentJoinType = this.state.joins.filter(join => join.id === joinId)[0].joinType;
+
+        let currentJoinTypeIndex;
+        for (let i=0; i<Constants.JOIN_IMAGES.length; i++) {
+            let join = Constants.JOIN_IMAGES[i];
+            if (join.name === currentJoinType) {
+                currentJoinTypeIndex = i;
+                break;
+            }
+        }
+
+        let nextJoinType;
+        let nextJoinImageUrl;
+        try {
+            nextJoinType = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].name;
+            nextJoinImageUrl = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].image;
+        } catch (e) {
+            nextJoinType = Constants.JOIN_IMAGES[0].name; // Default to first item in case of index out of range exception.
+            nextJoinImageUrl = Constants.JOIN_IMAGES[0].image; // Default to first item in case of index out of range exception.
+        }
+
+        // Copy state
+        let newState = Object.assign({}, this.state);
+        newState.joins.forEach(join => {
+            if (join.id === joinId) {
+                join.joinType = nextJoinType;
+                join.joinImageUrl = nextJoinImageUrl;
+            }
+        });
+
+        this.setState(newState);
     };
 
     toggleJoinsElementHandler = (elementToShow) => {
@@ -153,11 +269,25 @@ class QueryState extends Component {
 
                 <Joins
                     hidden={this.state.elementsVisibility.joinsElementHidden.toString()}
+                    joins={this.state.joins}
+                    availableTables={this.state.availableTables}
+                    availableColumns={this.state.availableColumns}
+                    onAddJoinClickHandler={this.onAddJoinClickHandler}
+                    onDeleteJoinHandler={this.onDeleteJoinHandler}
+                    onJoinImageClickHandler={this.onJoinImageClickHandler}
                 >
                 </Joins>
 
                 <OtherOptions
                     hidden={this.state.elementsVisibility.otherOptionsElementHidden.toString()}
+                    distinct={this.state.distinct}
+                    distinctHandler={this.updateDistinct}
+                    suppressNulls={this.state.suppressNulls}
+                    suppressNullsHandler={this.updateSuppressNulls}
+                    limit={this.state.limit}
+                    limitHandler={this.updateLimit}
+                    offset={this.state.offset}
+                    offsetHandler={this.updateOffset}
                 >
                 </OtherOptions>
 

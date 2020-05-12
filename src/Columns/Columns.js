@@ -1,13 +1,12 @@
 import * as React from "react";
 import './Columns.css';
 import * as Utils from '../Utils/Utils';
+import * as Constants from '../Config/Constants';
 
 class Columns extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {};
     }
 
     render() {
@@ -51,11 +50,14 @@ class Columns extends React.Component {
                 <div id="addRemoveColumns" className="available-columns-buttons-div">
                     <button id="addColumnsButton" name="addColumnsButton" type="button"
                             className="available-columns-add-button"
-                            onClick={this.props.selectColumnsHandler}
+                            onClick={() => this.props.selectColumnsHandler(Constants.ADD)}
                     >&#8594;</button>
+
                     <br/>
+
                     <button id="removeColumnsButton" name="removeColumnsButton" type="button"
                             className="available-columns-remove-button"
+                            onClick={() => this.props.selectColumnsHandler(Constants.REMOVE)}
                     >&#8592;</button>
                 </div>
 

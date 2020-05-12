@@ -11,7 +11,8 @@ const OtherOptions = (props) => {
                         <td>
                             <input id="distinct"
                                    type="checkbox"
-                                   // onClick={(event) => queryStateContainer.setDistinct(event.target.checked)}
+                                   checked={props.distinct}
+                                   onChange={(event) => props.distinctHandler(event.target.checked)}
                             />
                         </td>
                     </tr>
@@ -20,7 +21,8 @@ const OtherOptions = (props) => {
                         <td>
                             <input id="suppressNulls"
                                    type="checkbox"
-                                   // onClick={(event) => queryStateContainer.setSuppressNulls(event.target.checked)}
+                                   checked={props.suppressNulls}
+                                   onChange={(event) => props.suppressNullsHandler(event.target.checked)}
                             />
                         </td>
                     </tr>
@@ -28,7 +30,8 @@ const OtherOptions = (props) => {
                         <td>Limit Returned Records</td>
                         <td>
                             <select id="limit"
-                                    // onChange={(event) => queryStateContainer.setLimit(event.target.value)}
+                                    value={props.limit}
+                                    onChange={(event) => props.limitHandler(event.target.value)}
                             >
                                 <option value="">No Limit</option>
                                 <option value="10">10</option>
@@ -42,7 +45,8 @@ const OtherOptions = (props) => {
                         <td>Offset Returned Records</td>
                         <td>
                             <select id="offset"
-                                    // onChange={(event) => queryStateContainer.setOffset(event.target.value)}
+                                    value={props.offset}
+                                    onChange={(event) => props.offsetHandler(event.target.value)}
                             >
                                 <option value="">No Offset</option>
                                 <option value="10">10</option>

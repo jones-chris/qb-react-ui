@@ -15,3 +15,14 @@
     height: 15%;
 }
 
+.join-row {
+    text-align: center;
+}
+
+.delete-join-button {
+    float: right;
+}
+
+.join-image {
+    width: 10%;
+}

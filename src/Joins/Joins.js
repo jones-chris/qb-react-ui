@@ -13,27 +13,27 @@ class Joins extends Component {
         super(props);
     }
 
-    isJoinParentTable(fullyQualifiedTableName) {
-        for (let i=0; i<this.props.joins.length; i++) {
-            let join = this.props.joins[i];
-            if (join.parentTable.fullyQualifiedName === fullyQualifiedTableName) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    isJoinTargetTable(fullyQualifiedTableName) {
-        for (let i=0; i<this.props.joins.length; i++) {
-            let join = this.props.joins[i];
-            if (join.targetTable.fullyQualifiedName === fullyQualifiedTableName) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    // isJoinParentTable(fullyQualifiedTableName) {
+    //     for (let i=0; i<this.props.joins.length; i++) {
+    //         let join = this.props.joins[i];
+    //         if (join.parentTable.fullyQualifiedName === fullyQualifiedTableName) {
+    //             return true;
+    //         }
+    //     }
+    //
+    //     return false;
+    // }
+    //
+    // isJoinTargetTable(fullyQualifiedTableName) {
+    //     for (let i=0; i<this.props.joins.length; i++) {
+    //         let join = this.props.joins[i];
+    //         if (join.targetTable.fullyQualifiedName === fullyQualifiedTableName) {
+    //             return true;
+    //         }
+    //     }
+    //
+    //     return false;
+    // }
 
     isTableSelected(fullyQualifiedTableName, parentOrTarget) {
         if (this.props.joins.length === 0) {

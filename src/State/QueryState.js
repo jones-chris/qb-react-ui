@@ -38,13 +38,12 @@ class QueryState extends Component {
         // Bind handlers to `this` context.
         this.updateSelectedSchemas.bind(this);
         this.updateSelectedTables.bind(this);
-        this.toggleJoinsElementHandler.bind(this);
+        this.toggleElementVisibilityHandler.bind(this);
         this.updateSelectedColumns.bind(this);
         this.updateDistinct.bind(this);
         this.updateSuppressNulls.bind(this);
         this.updateLimit.bind(this);
         this.updateOffset.bind(this);
-        // this.shareState.bind(this);
         this.onAddJoinClickHandler.bind(this);
         this.onDeleteJoinHandler.bind(this);
         this.onJoinImageClickHandler.bind(this);
@@ -69,11 +68,15 @@ class QueryState extends Component {
         // First, update state's selectedSchemas.
         const selectElement = event.target;
         let newSelectedSchemas = Utils.getSelectedOptions(selectElement);
-        this.setState({ selectedSchemas: newSelectedSchemas });
+
+        // Get schema object that has been selected.
+        let selectedSchemaObjects = this.state.availableSchemas.filter(schema => newSelectedSchemas.includes(schema.fullyQualifiedName));
+
+        this.setState({ selectedSchemas: selectedSchemaObjects });
 
         // Second, get available tables for the selected schemas.
         // todo:  this is hard coded to the 0th selected schema because multiple schemas are not supported in the API yet.
-        this.getAvailableTables(newSelectedSchemas[0])
+        this.getAvailableTables(selectedSchemaObjects[0].schemaName)
     };
 
     updateSelectedTables = (event) => {
@@ -81,12 +84,18 @@ class QueryState extends Component {
 
         // First, update state's selectedTables.
         const selectElement = event.target;
-        let newSelectedTables = Utils.getSelectedOptions(selectElement);
-        this.setState({selectedTables: newSelectedTables});
+        let newSelectedTableFullyQualifiedNames = Utils.getSelectedOptions(selectElement);
+
+        // Get table objects that have been selected.
+        console.log(this.state.availableTables);
+        let selectedTableObjects = this.state.availableTables.filter(table => newSelectedTableFullyQualifiedNames.includes(table.fullyQualifiedName));
+
+        this.setState({selectedTables: selectedTableObjects});
 
         // Second, get available columns for selected tables.
         // todo:  this is hard coded to the 0th selected schema because multiple schemas are not supported in the API yet.
-        this.getAvailableColumns(this.state.selectedSchemas[0], newSelectedTables);
+        let newSelectedTableNames = selectedTableObjects.map(selectedTableObj => selectedTableObj.tableName);
+        this.getAvailableColumns(this.state.selectedSchemas[0].schemaName, newSelectedTableNames);
     };
 
     getAvailableTables(schemaName) {
@@ -157,15 +166,6 @@ class QueryState extends Component {
         this.setState({offset: newOffset});
     };
 
-    // shareState = (stateAttribute, newState) => {
-    //     console.log(this.state);
-    //
-    //     if (stateAttribute === Constants.SELECTED_TABLES_STATE) { this.setState({selectedTables: newState}); }
-    //     else if (stateAttribute === Constants.SELECTED_COLUMNS_STATE) { this.setState({selectedColumns: newState}); }
-    //     else if (stateAttribute === Constants.JOINS_STATE) { this.setState({joins: newState}); }
-    //     else if (stateAttribute === Constants.DISTINCT_STATE) { this.setState({distinct: newState}); }
-    // };
-
     onAddJoinClickHandler = () => {
         let newState = Object.assign({}, this.state);
         newState.joins.push({
@@ -234,18 +234,6 @@ class QueryState extends Component {
     };
 
     onJoinTableChangeHandler = (joinId, event, parentOrTarget) => {
-        //     let parentTableName = Utils.getSelectedOptions(event.target)[0];
-        //     let parentTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === parentTableName; })[0];
-        //
-        //     let newJoins = Object.assign([], this.state.joins);
-        //
-        //     newJoins.forEach(join => {
-        //         if (join.id === joinId) {
-        //             join.parentTable = parentTableObject;
-        //         }
-        //     });
-        //
-        //     this.setState({joins: newJoins});
         let tableName = Utils.getSelectedOptions(event.target)[0];
         let tableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === tableName; })[0];
 
@@ -264,7 +252,7 @@ class QueryState extends Component {
         this.setState({joins: newJoins});
     };
 
-    toggleJoinsElementHandler = (elementToShow) => {
+    toggleElementVisibilityHandler = (elementToShow) => {
         // Copy state.
         let newState = Object.assign({}, this.state);
 
@@ -295,7 +283,7 @@ class QueryState extends Component {
         return (
             <div>
                 <MenuBar
-                    toggleElementVisibilityHandler={this.toggleJoinsElementHandler}
+                    toggleElementVisibilityHandler={this.toggleElementVisibilityHandler}
                 >
                 </MenuBar>
 
@@ -330,6 +318,7 @@ class QueryState extends Component {
                     selectSchemasHandler={this.updateSelectedSchemas}
                     availableTables={this.state.availableTables}
                     selectTablesHandler={this.updateSelectedTables}
+                    selectedTables={this.state.selectedTables}
                 >
                 </SchemasAndTables>
 

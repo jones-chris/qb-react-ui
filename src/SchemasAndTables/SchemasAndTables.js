@@ -6,19 +6,6 @@ class SchemasAndTables extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            availableSchemas: [],
-            selectedSchemas: [],
-            availableTables: [],
-            selectedTables: []
-        };
-
-        this.handleChange.bind(this);
-    }
-
-    handleChange(e) {
-        console.log(e);
     }
 
     render() {
@@ -26,16 +13,36 @@ class SchemasAndTables extends Component {
         const availableSchemas = [];
         this.props.availableSchemas.forEach(schema => {
             availableSchemas.push(
-                <option key={`${schema.databaseName}.${schema.schemaName}`} value={schema.schemaName}>{schema.schemaName}</option>
+                <option key={schema.fullyQualifiedName}
+                        value={schema.fullyQualifiedName}
+                >
+                    {schema.schemaName}
+                </option>
             )
         });
 
         // Create JSX list of all available tables so that it can be used when rendering.
         const availableTables = [];
         if (this.props.availableTables) {
+            // Get selected tables...the map() function was returning an empty array so I have to do it the verbose way.
+            let selectedTables = [];
+            for (let i=0; i<this.props.selectedTables.length; i++) {
+                let selectedTable = this.props.selectedTables[i];
+                let fullyQualifiedName = selectedTable.fullyQualifiedName;
+                selectedTables.push(fullyQualifiedName);
+            }
+
+            // For each available table, create the JSX.
             this.props.availableTables.forEach(table => {
+                let isSelected = selectedTables.includes(table.fullyQualifiedName);
+
                 availableTables.push(
-                    <option key={`${table.databaseName}.${table.schemaName}.${table.tableName}`} value={table.tableName}>{table.tableName}</option>
+                    <option key={table.fullyQualifiedName}
+                            value={table.fullyQualifiedName}
+                            selected={isSelected}
+                    >
+                        {table.tableName}
+                    </option>
                 );
             })
         }

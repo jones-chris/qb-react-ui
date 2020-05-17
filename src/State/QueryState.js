@@ -29,6 +29,7 @@ class QueryState extends Component {
             availableColumns: [],
             selectedColumns: [],
             joins: [],
+            joinAvailableColumns: new Map(),
             distinct: false,
             suppressNulls: false,
             limit: 10,
@@ -167,14 +168,19 @@ class QueryState extends Component {
     };
 
     onAddJoinClickHandler = () => {
+        let defaultTableObject = '';
+        if (this.state.availableTables.length > 0) {
+            defaultTableObject = this.state.availableTables[0];
+        }
+
         let newState = Object.assign({}, this.state);
         newState.joins.push({
             'key': newState.joins.length,
             'id': newState.joins.length,
             'joinType': Constants.JOIN_IMAGES[0].name,
             'joinImageUrl': Constants.JOIN_IMAGES[0].image,
-            'parentTable': '',
-            'targetTable': '',
+            'parentTable': defaultTableObject,
+            'targetTable': defaultTableObject,
             'parentJoinColumns': [],
             'targetJoinColumns': []
         });
@@ -192,6 +198,23 @@ class QueryState extends Component {
         // Renumber join ids.
         for (let i=0; i<newState.joins.length; i++) {
             newState.joins[i].id = i;
+            newState.joins[i].key = i;
+        }
+
+        // Delete map entry from joinAvailableColumns that has a key matching the join id.
+        let matchingJoinWasDeleted = false;
+        for (const [key, value] of newState.joinAvailableColumns.entries()) {
+            if (key === joinId) {
+                newState.joinAvailableColumns.delete(key);
+                matchingJoinWasDeleted = true;
+                continue;
+            }
+
+            // Renumber the value.  If the join was deleted already, move all items after that item back one "slot" in the map.
+            if (matchingJoinWasDeleted) {
+                newState.joinAvailableColumns.set(key - 1, value);
+                newState.joinAvailableColumns.delete(key);
+            }
         }
 
         this.setState(newState);
@@ -233,23 +256,48 @@ class QueryState extends Component {
         this.setState(newState);
     };
 
-    onJoinTableChangeHandler = (joinId, event, parentOrTarget) => {
-        let tableName = Utils.getSelectedOptions(event.target)[0];
-        let tableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === tableName; })[0];
+    onJoinTableChangeHandler = (joinId, parentTableEl, targetTableEl) => {
+        let parentTableName = Utils.getSelectedOptions(document.getElementById(parentTableEl))[0];
+        let parentTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === parentTableName; })[0];
+
+        let targetTableName = Utils.getSelectedOptions(document.getElementById(targetTableEl))[0];
+        let targetTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === targetTableName; })[0];
 
         let newJoins = Object.assign([], this.state.joins);
 
+        // Copy state's joinAvailableColumns so that it can be updated.
+        // Set the parent table or target table for the join.
+        // Set the available parent columns or available target columns.
+        let newJoinAvailableColumns = new Map(this.state.joinAvailableColumns);
         newJoins.forEach(join => {
             if (join.id === joinId) {
-                if (parentOrTarget === Constants.PARENT) {
-                    join.parentTable = tableObject;
-                } else if (parentOrTarget === Constants.TARGET) {
-                    join.targetTable = tableObject;
-                }
+                // Update join's parent and target tables.
+                join.parentTable = parentTableObject;
+                join.targetTable = targetTableObject;
+
+                // Get available parent columns for this join.
+                let newAvailableParentColumns = this.state.availableColumns.filter(column => {
+                    return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
+                });
+
+                // Get available target columns for this join.
+                let newAvailableTargetColumns = this.state.availableColumns.filter(column => {
+                    return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
+                });
+
+                // Update the join's available parent and target columns.
+                newJoinAvailableColumns.set(joinId, {
+                    availableParentColumns: newAvailableParentColumns,
+                    availableTargetColumns: newAvailableTargetColumns
+                });
             }
         });
 
-        this.setState({joins: newJoins});
+        // Update state.
+        this.setState({
+            joins: newJoins,
+            joinAvailableColumns: newJoinAvailableColumns
+        });
     };
 
     toggleElementVisibilityHandler = (elementToShow) => {
@@ -290,12 +338,13 @@ class QueryState extends Component {
                 <Joins
                     hidden={this.state.elementsVisibility.joinsElementHidden.toString()}
                     joins={this.state.joins}
-                    availableTables={this.state.availableTables}
-                    availableColumns={this.state.availableColumns}
+                    availableTables={this.state.selectedTables}  // The tables the user selects are the tables available for the user to join.
+                    // availableColumns={this.state.availableColumns}  // todo:  remove this eventually.
                     onAddJoinClickHandler={this.onAddJoinClickHandler}
                     onDeleteJoinHandler={this.onDeleteJoinHandler}
                     onJoinImageClickHandler={this.onJoinImageClickHandler}
                     onJoinTableChangeHandler={this.onJoinTableChangeHandler}
+                    availableColumns={this.state.joinAvailableColumns}
                 >
                 </Joins>
 

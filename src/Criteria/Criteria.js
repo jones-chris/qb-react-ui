@@ -17,6 +17,7 @@ class Criteria extends React.Component {
                     criterion={criterion}
                     availableColumns={this.props.availableColumns}
                     updateCriterionHandler={this.props.updateCriterionHandler}
+                    deleteCriterionHandler={this.props.deleteCriterionHandler}
                 >
                 </Criterion>
             )

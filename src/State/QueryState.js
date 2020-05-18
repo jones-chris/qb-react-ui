@@ -53,6 +53,7 @@ class QueryState extends Component {
         this.onJoinTableChangeHandler.bind(this);
         this.addCriterion.bind(this);
         this.updateCriterion.bind(this);
+        this.deleteCriterion.bind(this);
     }
 
     componentDidMount() {
@@ -341,6 +342,28 @@ class QueryState extends Component {
         this.setState({criteria: newCriteria});
     };
 
+    deleteCriterion = (criterionId) => {
+        // Remove the criterion with the matching id.
+        let newCriteria = this.state.criteria.filter(criterion => criterion.id !== criterionId);
+
+        // Renumber remaining criteria.
+        for (let i=0; i<newCriteria.length; i++) {
+            let criterion = newCriteria[i];
+
+            criterion.id = i;
+
+            // If the 0th criterion was not deleted, then set the criterion's parentId to the previous criterion from
+            // what it currently is.
+            if (criterion.parentId === criterionId) {
+                if (criterionId > 0) {
+                    criterion.parentId = parseInt(criterion.parentId) - 1;
+                }
+            }
+        }
+
+        this.setState({criteria: newCriteria});
+    };
+
     toggleElementVisibilityHandler = (elementToShow) => {
         // Copy state.
         let newState = Object.assign({}, this.state);
@@ -425,6 +448,7 @@ class QueryState extends Component {
                     addCriterionHandler={this.addCriterion}
                     availableColumns={this.state.availableColumns}
                     updateCriterionHandler={this.updateCriterion}
+                    deleteCriterionHandler={this.deleteCriterion}
                 >
                 </Criteria>
             </div>

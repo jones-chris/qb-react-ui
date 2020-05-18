@@ -45,3 +45,10 @@ export const REMOVE = 'remove';
 // Join parent and target constants.
 export const PARENT = 'parent';
 export const TARGET = 'target';
+
+// Criterion model object attributes that can be updated.
+export const PARENT_ID = 'parentId';
+export const CONJUNCTION = 'conjunction';
+export const COLUMN = 'column';
+export const OPERATOR = 'operator';
+export const FILTER = 'filter';

@@ -6,6 +6,7 @@ import OtherOptions from "../OtherOptions/OtherOptions";
 import * as Constants from '../Config/Constants';
 import Columns from "../Columns/Columns";
 import * as Utils from '../Utils/Utils';
+import Criteria from "../Criteria/Criteria";
 
 class QueryState extends Component {
 
@@ -30,6 +31,7 @@ class QueryState extends Component {
             selectedColumns: [],
             joins: [],
             joinAvailableColumns: new Map(),
+            criteria: [],
             distinct: false,
             suppressNulls: false,
             limit: 10,
@@ -49,6 +51,8 @@ class QueryState extends Component {
         this.onDeleteJoinHandler.bind(this);
         this.onJoinImageClickHandler.bind(this);
         this.onJoinTableChangeHandler.bind(this);
+        this.addCriterion.bind(this);
+        this.updateCriterion.bind(this);
     }
 
     componentDidMount() {
@@ -300,6 +304,43 @@ class QueryState extends Component {
         });
     };
 
+    addCriterion = (parentId) => {
+        // Copy the state's criteria to a new array.
+        let newCriteria = Object.assign([], this.state.criteria);
+
+        // Get the next id.
+        let nextId = this.state.criteria.length;
+
+        // Instantiate a new criterion model with the id and parent id.
+        let criterion = {
+            id: nextId,
+            parentId: parentId,
+            conjunction: 'AND',
+            frontParenthesis: null,
+            column: null,
+            operator: null,
+            filter: null,
+            endParenthesis: null
+        };
+
+        // Add the new criterion to the criteria array.
+        newCriteria.push(criterion);
+
+        this.setState({criteria: newCriteria});
+    };
+
+    updateCriterion = (criterionId, criterionObjectAttributeName, value) => {
+        let newCriteria = Object.assign([], this.state.criteria);
+
+        newCriteria.forEach(criterion => {
+            if (criterion.id === criterionId) {
+                criterion[criterionObjectAttributeName] = value;
+            }
+        });
+
+        this.setState({criteria: newCriteria});
+    };
+
     toggleElementVisibilityHandler = (elementToShow) => {
         // Copy state.
         let newState = Object.assign({}, this.state);
@@ -339,7 +380,6 @@ class QueryState extends Component {
                     hidden={this.state.elementsVisibility.joinsElementHidden.toString()}
                     joins={this.state.joins}
                     availableTables={this.state.selectedTables}  // The tables the user selects are the tables available for the user to join.
-                    // availableColumns={this.state.availableColumns}  // todo:  remove this eventually.
                     onAddJoinClickHandler={this.onAddJoinClickHandler}
                     onDeleteJoinHandler={this.onDeleteJoinHandler}
                     onJoinImageClickHandler={this.onJoinImageClickHandler}
@@ -378,6 +418,15 @@ class QueryState extends Component {
                     selectedColumns={this.state.selectedColumns}
                 >
                 </Columns>
+
+                <Criteria
+                    hidden={this.state.elementsVisibility.criteriaElementHidden.toString()}
+                    criteria={this.state.criteria}
+                    addCriterionHandler={this.addCriterion}
+                    availableColumns={this.state.availableColumns}
+                    updateCriterionHandler={this.updateCriterion}
+                >
+                </Criteria>
             </div>
         );
     }

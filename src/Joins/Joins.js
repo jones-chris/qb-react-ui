@@ -1,98 +1,20 @@
 import React, { Component } from 'react';
 import './Joins.css'
-import * as Constants from '../Config/Constants';
 
 
 class Joins extends Component {
-
-    state = {
-        joins: []
-    };
 
     constructor(props) {
         super(props);
     }
 
-    isTableSelected(joinId, fullyQualifiedTableName, parentOrTarget) {
-        if (this.props.joins.length === 0) {
-            return false;
-        }
-
-        // for (let i=0; i<this.props.joins.length; i++) {
-        //     let join = this.props.joins[i];
-        let join = this.props.joins.filter(join => join.id === joinId);
-            if (parentOrTarget === Constants.PARENT) {
-                if (join.parentTable.fullyQualifiedName === fullyQualifiedTableName) {
-                    return true;
-                }
-            } else if (parentOrTarget === Constants.TARGET) {
-                if (join.targetTable.fullyQualifiedName === fullyQualifiedTableName) {
-                    return true;
-                }
-            }
-        // }
-
-        return false;
-    }
-
     render() {
-        // // Create available tables JSX for parent table select element.
-        // const availableTablesParentTableOptions = this.props.availableTables.map(table => {
-        //     return <option key={table.fullyQualifiedName}
-        //                    value={table.fullyQualifiedName}
-        //                    selected={this.isTableSelected(table.fullyQualifiedName, Constants.PARENT)}
-        //             >
-        //         {table.tableName}
-        //     </option>
-        // });
-        //
-        // // Create available tables JSX for target table select element.
-        // const availableTablesTargetTableOptions = this.props.availableTables.map(table => {
-        //     return <option key={table.fullyQualifiedName}
-        //                    value={table.fullyQualifiedName}
-        //                    selected={this.isTableSelected(table.fullyQualifiedName, Constants.TARGET)}
-        //             >
-        //         {table.tableName}
-        //     </option>
-        // });
-
-        // // Create available columns JSX.
-        // const availableColumns = this.props.availableColumns.map(column => {
-        //     return <option key={column.fullyQualifiedName}
-        //                    value={column.fullyQualifiedName}
-        //             >
-        //         {column.columnName}
-        //     </option>
-        // });
-
-        // Create available parent columns JSX.
-        // if (this.props.availableColumns.size() > 0) {
-        //     const availableParentColumns = this.props.availableColumns.values().map(value => {
-        //         return <option key={column.fullyQualifiedName}
-        //                        value={column.fullyQualifiedName}
-        //         >
-        //             {column.columnName}
-        //         </option>
-        //     });
-        // }
-
-
-        // Create available target columns JSX.
-        // const availableTargetColumns = this.props.availableColumns.availableTargetColumns.map(column => {
-        //     return <option key={column.fullyQualifiedName}
-        //                    value={column.fullyQualifiedName}
-        //     >
-        //         {column.columnName}
-        //     </option>
-        // });
-
         // Create joins JSX.
         const joinsJsx = this.props.joins.map(join => {
             // Create available tables JSX for parent table select element.
             const availableTablesParentTableOptions = this.props.availableTables.map(table => {
                 return <option key={table.fullyQualifiedName}
                                value={table.fullyQualifiedName}
-                               // selected={this.isTableSelected(join.id, table.fullyQualifiedName, Constants.PARENT)}
                                selected={join.parentTable.fullyQualifiedName === table.fullyQualifiedName}
                 >
                     {table.tableName}
@@ -103,7 +25,6 @@ class Joins extends Component {
             const availableTablesTargetTableOptions = this.props.availableTables.map(table => {
                 return <option key={table.fullyQualifiedName}
                                value={table.fullyQualifiedName}
-                               // selected={this.isTableSelected(join.id, table.fullyQualifiedName, Constants.TARGET)}
                                selected={join.targetTable.fullyQualifiedName === table.fullyQualifiedName}
                 >
                     {table.tableName}

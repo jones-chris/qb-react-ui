@@ -320,7 +320,7 @@ class QueryState extends Component {
             if (criterion.id >= id) {
                 criterion.id += 1;
 
-                if (criterion.parentId !== null) {
+                if (criterion.parentId !== null && criterion.parentId >= id) {
                     criterion.parentId += 1;
                 }
             }
@@ -377,12 +377,23 @@ class QueryState extends Component {
 
             criterion.id = i;
 
+            // If criterion is new first root criteria, then set parent id and level.
+            if (criterion.id === 0) {
+                criterion.parentId = null;
+                criterion.metadata.level = 0;
+            }
+
             // If the 0th criterion was not deleted, then set the criterion's parentId to the previous criterion from
             // what it currently is.
-            if (criterion.parentId === criterionId) {
-                if (criterionId > 0) {
-                    criterion.parentId = parseInt(criterion.parentId) - 1;
-                }
+
+            // If the criterion's parent id is equal or greater than the criterion that was deleted, then reduce parentId
+            // by 1.
+            if (criterion.parentId !== null && criterion.parentId >= criterionId) {
+                criterion.parentId = parseInt(criterion.parentId) - 1;
+
+                // Get the new criterion's level.  This will be the parent criterion's level plus 1.
+                let parentCriterion = this.state.criteria.find(crit => crit.id === criterion.parentId);
+                criterion.metadata.level = parentCriterion.metadata.level + 1;
             }
         }
 

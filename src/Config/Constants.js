@@ -13,6 +13,7 @@ export const SCHEMAS_AND_TABLES = 'Schemas & Tables';
 export const COLUMNS = 'Columns';
 export const CRITERIA = 'Criteria';
 export const OTHER_OPTIONS = 'Other Options';
+export const QUERY_TEMPLATES = 'Query Templates';
 
 // State names.
 export const AVAILABLE_SCHEMAS_STATE = 'availableSchemas';

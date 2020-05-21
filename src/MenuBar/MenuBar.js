@@ -47,6 +47,14 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
+                        <li className={this.state.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}
+                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.QUERY_TEMPLATES)}
+                        >
+                            <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>
+                        </li>
+
+                        <hr className="divider"/>
+
                         <li className={this.state.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.SCHEMAS_AND_TABLES)}
                         >
@@ -86,10 +94,17 @@ class MenuBar extends Component {
                         </li>
 
                     </ul>
-                    <form className="form-inline my-2 my-lg-0">
-                        <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                    </form>
+
+                    <button className="btn btn-outline-primary my-2 my-sm-0"
+                            onClick={this.props.runQueryHandler}
+                    >
+                        Run Query
+                    </button>
+
+                    {/*<form className="form-inline my-2 my-lg-0">*/}
+                    {/*    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>*/}
+                    {/*    <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>*/}
+                    {/*</form>*/}
                 </div>
             </nav>
         );

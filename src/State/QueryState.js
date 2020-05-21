@@ -7,6 +7,7 @@ import * as Constants from '../Config/Constants';
 import Columns from "../Columns/Columns";
 import * as Utils from '../Utils/Utils';
 import Criteria from "../Criteria/Criteria";
+import QueryTemplates from "../QueryTemplates/QueryTemplates";
 
 class QueryState extends Component {
 
@@ -35,7 +36,8 @@ class QueryState extends Component {
             distinct: false,
             suppressNulls: false,
             limit: 10,
-            offset: 0
+            offset: 0,
+            ascending: false
         };
 
         // Bind handlers to `this` context.
@@ -54,6 +56,7 @@ class QueryState extends Component {
         this.addCriterion.bind(this);
         this.updateCriterion.bind(this);
         this.deleteCriterion.bind(this);
+        this.runQuery.bind(this);
     }
 
     componentDidMount() {
@@ -415,8 +418,53 @@ class QueryState extends Component {
         else if (elementToShow === Constants.COLUMNS) { newState.elementsVisibility.columnsElementHidden = false; }
         else if (elementToShow === Constants.CRITERIA) { newState.elementsVisibility.criteriaElementHidden = false; }
         else if (elementToShow === Constants.OTHER_OPTIONS) { newState.elementsVisibility.otherOptionsElementHidden = false; }
+        else if (elementToShow === Constants.QUERY_TEMPLATES) { newState.elementsVisibility.queryTemplatesElementHidden = false; }
 
         this.setState(newState);
+    };
+
+    runQuery = () => {
+        // Put selected columns in the format the API is expecting.
+        // todo:  change this once the qb4j library, backend, and front end all use the same schema.
+        let selectedColumns = [];
+        for (let column of this.state.selectedColumns) {
+            selectedColumns.push({
+                fullyQualifiedName: column.tableName + '.' + column.columnName,
+                alias: ''
+            });
+        }
+
+        // Determine parent table.
+        let targetJoinTables = this.state.joins.map(join => join.targetTable.fullyQualifiedName);
+        let parentTable = this.state.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
+
+        // Build statement object
+        let statement = {
+            name: '',
+            columns: selectedColumns,
+            table: parentTable.tableName, // todo:  pass entire parentTable object to API when object structures are standardized across library, backend, and frontend.
+            criteria: this.state.criteria,
+            joins: this.state.joins,
+            distinct: this.state.distinct,
+            groupBy: false,
+            orderBy: false,
+            limit: this.state.limit,
+            ascending: this.state.ascending,
+            offset: this.state.offset,
+            suppressNulls: this.state.suppressNulls
+        };
+
+        console.log(statement);
+
+        // Send request to API.
+        fetch('http://localhost:8080/data/querybuilder4j/query', {
+            method: 'POST',
+            body: JSON.stringify(statement),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+            .then(json => console.log(json));
     };
 
     render() {
@@ -432,6 +480,7 @@ class QueryState extends Component {
             <div>
                 <MenuBar
                     toggleElementVisibilityHandler={this.toggleElementVisibilityHandler}
+                    runQueryHandler={this.runQuery}
                 >
                 </MenuBar>
 
@@ -487,6 +536,11 @@ class QueryState extends Component {
                     deleteCriterionHandler={this.deleteCriterion}
                 >
                 </Criteria>
+
+                <QueryTemplates
+                    hidden={this.state.elementsVisibility.queryTemplatesElementHidden.toString()}
+                >
+                </QueryTemplates>
             </div>
         );
     }

@@ -31,7 +31,7 @@ class QueryState extends Component {
             availableColumns: [],
             selectedColumns: [],
             joins: [],
-            joinAvailableColumns: new Map(),
+            // joinAvailableColumns: new Map(),
             criteria: [],
             distinct: false,
             suppressNulls: false,
@@ -53,6 +53,7 @@ class QueryState extends Component {
         this.onDeleteJoinHandler.bind(this);
         this.onJoinImageClickHandler.bind(this);
         this.onJoinTableChangeHandler.bind(this);
+        this.onJoinColumnChangeHandler.bind(this);
         this.addCriterion.bind(this);
         this.updateCriterion.bind(this);
         this.deleteCriterion.bind(this);
@@ -61,7 +62,7 @@ class QueryState extends Component {
 
     componentDidMount() {
         // Get available schemas.
-        fetch('http://localhost:8080/metadata/querybuilder4j/schema')
+        fetch('http://localhost:8000/metadata/querybuilder4j/schema')
             .then(response => response.json())
             .then(schemas => {
                 console.log(schemas);
@@ -110,7 +111,7 @@ class QueryState extends Component {
     getAvailableTables(schemaName) {
         this.setState({ isLoading: true });
 
-        fetch(`http://localhost:8080/metadata/querybuilder4j/${schemaName}/table-and-view`)
+        fetch(`http://localhost:8000/metadata/querybuilder4j/${schemaName}/table-and-view`)
             .then(response => response.json())
             .then(tables => {
                 console.log(tables);
@@ -125,7 +126,7 @@ class QueryState extends Component {
     getAvailableColumns(schemaName, tables) {
         this.setState({ isLoading: true });
 
-        fetch(`http://localhost:8080/metadata/querybuilder4j/${schemaName}/${tables.join('&')}/column`)
+        fetch(`http://localhost:8000/metadata/querybuilder4j/${schemaName}/${tables.join('&')}/column`)
             .then(response => response.json())
             .then(columns => {
                 console.log(columns);
@@ -183,14 +184,19 @@ class QueryState extends Component {
 
         let newState = Object.assign({}, this.state);
         newState.joins.push({
-            'key': newState.joins.length,
-            'id': newState.joins.length,
-            'joinType': Constants.JOIN_IMAGES[0].name,
-            'joinImageUrl': Constants.JOIN_IMAGES[0].image,
-            'parentTable': defaultTableObject,
-            'targetTable': defaultTableObject,
-            'parentJoinColumns': [],
-            'targetJoinColumns': []
+            joinType: Constants.JOIN_IMAGES[0].name,
+            parentTable: defaultTableObject,
+            targetTable: defaultTableObject,
+            parentJoinColumns: [],
+            targetJoinColumns: [],
+            metadata: {
+                id: newState.joins.length,
+                joinImageUrl: Constants.JOIN_IMAGES[0].image,
+                availableColumns: {
+                    parentColumns: [],
+                    targetColumns: []
+                }
+            }
         });
 
         this.setState(newState);
@@ -200,38 +206,21 @@ class QueryState extends Component {
         joinId = parseInt(joinId);
 
         // Create new array of joins that excludes the id being deleted.
-        let newState = Object.assign({}, this.state);
-        newState.joins = newState.joins.filter(join => join.id !== joinId);
+        let newJoins = Object.assign([], this.state.joins);
+        newJoins = newJoins.filter(join => join.metadata.id !== joinId);
 
         // Renumber join ids.
-        for (let i=0; i<newState.joins.length; i++) {
-            newState.joins[i].id = i;
-            newState.joins[i].key = i;
+        for (let i=0; i<newJoins.length; i++) {
+            newJoins[i].metadata.id = i;
         }
 
-        // Delete map entry from joinAvailableColumns that has a key matching the join id.
-        let matchingJoinWasDeleted = false;
-        for (const [key, value] of newState.joinAvailableColumns.entries()) {
-            if (key === joinId) {
-                newState.joinAvailableColumns.delete(key);
-                matchingJoinWasDeleted = true;
-                continue;
-            }
-
-            // Renumber the value.  If the join was deleted already, move all items after that item back one "slot" in the map.
-            if (matchingJoinWasDeleted) {
-                newState.joinAvailableColumns.set(key - 1, value);
-                newState.joinAvailableColumns.delete(key);
-            }
-        }
-
-        this.setState(newState);
+        this.setState({ joins: newJoins });
     };
 
     onJoinImageClickHandler = (joinId) => {
         // Get next join image based on currentJoinType.
         joinId = parseInt(joinId);
-        let currentJoinType = this.state.joins.filter(join => join.id === joinId)[0].joinType;
+        let currentJoinType = this.state.joins.find(join => join.metadata.id === joinId).joinType;
 
         let currentJoinTypeIndex;
         for (let i=0; i<Constants.JOIN_IMAGES.length; i++) {
@@ -255,9 +244,9 @@ class QueryState extends Component {
         // Copy state
         let newState = Object.assign({}, this.state);
         newState.joins.forEach(join => {
-            if (join.id === joinId) {
+            if (join.metadata.id === joinId) {
                 join.joinType = nextJoinType;
-                join.joinImageUrl = nextJoinImageUrl;
+                join.metadata.joinImageUrl = nextJoinImageUrl;
             }
         });
 
@@ -266,46 +255,70 @@ class QueryState extends Component {
 
     onJoinTableChangeHandler = (joinId, parentTableEl, targetTableEl) => {
         let parentTableName = Utils.getSelectedOptions(document.getElementById(parentTableEl))[0];
-        let parentTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === parentTableName; })[0];
+        let parentTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
 
         let targetTableName = Utils.getSelectedOptions(document.getElementById(targetTableEl))[0];
-        let targetTableObject = this.state.availableTables.filter(table => { return table.fullyQualifiedName === targetTableName; })[0];
+        let targetTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === targetTableName; });
 
         let newJoins = Object.assign([], this.state.joins);
 
-        // Copy state's joinAvailableColumns so that it can be updated.
-        // Set the parent table or target table for the join.
-        // Set the available parent columns or available target columns.
-        let newJoinAvailableColumns = new Map(this.state.joinAvailableColumns);
         newJoins.forEach(join => {
-            if (join.id === joinId) {
+            if (join.metadata.id === joinId) {
+
                 // Update join's parent and target tables.
                 join.parentTable = parentTableObject;
                 join.targetTable = targetTableObject;
 
+                // Update join's parentJoinColumns and targetJoinColumns
+                if (join.parentJoinColumns.length === 0) {
+                    join.parentJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                        return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
+                    }));
+                }
+
+                if (join.targetJoinColumns.length === 0) {
+                    join.targetJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                        return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
+                    }));
+                }
+
                 // Get available parent columns for this join.
-                let newAvailableParentColumns = this.state.availableColumns.filter(column => {
+                join.metadata.availableColumns.parentColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
                     return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
                 });
 
                 // Get available target columns for this join.
-                let newAvailableTargetColumns = this.state.availableColumns.filter(column => {
+                join.metadata.availableColumns.targetColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
                     return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
-                });
-
-                // Update the join's available parent and target columns.
-                newJoinAvailableColumns.set(joinId, {
-                    availableParentColumns: newAvailableParentColumns,
-                    availableTargetColumns: newAvailableTargetColumns
                 });
             }
         });
 
         // Update state.
-        this.setState({
-            joins: newJoins,
-            joinAvailableColumns: newJoinAvailableColumns
+        this.setState({ joins: newJoins });
+    };
+
+    onJoinColumnChangeHandler = (joinId, parentColumnElName, targetColumnElName) => {
+        // Get join columns index.
+        let parentColumnEl = document.getElementById(parentColumnElName);
+        let index = parseInt(parentColumnEl.getAttribute('data-index'));
+
+        let parentColumn = Utils.getSelectedOptions(document.getElementById(parentColumnElName))[0];
+        let parentColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === parentColumn; });
+
+        let targetColumn = Utils.getSelectedOptions(document.getElementById(targetColumnElName))[0];
+        let targetColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === targetColumn; });
+
+        let newJoins = Object.assign([], this.state.joins);
+
+        newJoins.forEach(join => {
+            if (join.metadata.id === joinId) {
+                join.parentJoinColumns.splice(index, 1, parentColumnObject);
+                join.targetJoinColumns.splice(index, 1, targetColumnObject);
+            }
         });
+
+        this.setState({ joins: newJoins });
     };
 
     addCriterion = (parentId) => {
@@ -457,7 +470,7 @@ class QueryState extends Component {
         console.log(statement);
 
         // Send request to API.
-        fetch('http://localhost:8080/data/querybuilder4j/query', {
+        fetch('http://localhost:8000/data/querybuilder4j/query', {
             method: 'POST',
             body: JSON.stringify(statement),
             headers: {
@@ -493,6 +506,7 @@ class QueryState extends Component {
                     onJoinImageClickHandler={this.onJoinImageClickHandler}
                     onJoinTableChangeHandler={this.onJoinTableChangeHandler}
                     availableColumns={this.state.joinAvailableColumns}
+                    onJoinColumnChangeHandler={this.onJoinColumnChangeHandler}
                 >
                 </Joins>
 

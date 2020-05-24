@@ -11,6 +11,7 @@ class Criterion extends React.Component {
     render() {
         let criterion = this.props.criterion;
 
+        // Create option HTML elements for each available column.
         let availableColumnsJsx = [];
         this.props.availableColumns.forEach(availableColumn => {
             availableColumnsJsx.push(
@@ -23,6 +24,7 @@ class Criterion extends React.Component {
             )
         });
 
+        // Create the padding left value (50px for each level).
         let paddingLeftNum = (criterion.metadata.level * 50) + 'px';
 
         return (

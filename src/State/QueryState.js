@@ -31,7 +31,6 @@ class QueryState extends Component {
             availableColumns: [],
             selectedColumns: [],
             joins: [],
-            // joinAvailableColumns: new Map(),
             criteria: [],
             distinct: false,
             suppressNulls: false,
@@ -492,6 +491,7 @@ class QueryState extends Component {
         return (
             <div>
                 <MenuBar
+                    elementVisibility={this.state.elementsVisibility}
                     toggleElementVisibilityHandler={this.toggleElementVisibilityHandler}
                     runQueryHandler={this.runQuery}
                 >

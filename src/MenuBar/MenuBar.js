@@ -5,15 +5,6 @@ import * as Constants from '../Config/Constants';
 
 class MenuBar extends Component {
 
-    state = {
-        queryTemplatesElementHidden: true,
-        schemasAndTablesElementHidden: false,
-        joinsElementHidden: true,
-        columnsElementHidden: true,
-        criteriaElementHidden: true,
-        otherOptionsElementHidden: true
-    };
-
     constructor(props) {
         super(props);
     }
@@ -47,7 +38,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.QUERY_TEMPLATES)}
                         >
                             <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>
@@ -55,7 +46,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.SCHEMAS_AND_TABLES)}
                         >
                             <a className="nav-link" href="#">{Constants.SCHEMAS_AND_TABLES} <span className="sr-only">(current)</span></a>
@@ -63,7 +54,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.joinsElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.joinsElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.JOINS)}
                         >
                             <a className="nav-link" href="#">{Constants.JOINS} <span className="sr-only">(current)</span></a>
@@ -71,7 +62,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.columnsElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.columnsElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.COLUMNS)}
                         >
                             <a className="nav-link" href="#">{Constants.COLUMNS} <span className="sr-only">(current)</span></a>
@@ -79,7 +70,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.criteriaElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.criteriaElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.CRITERIA)}
                         >
                             <a className="nav-link" href="#">{Constants.CRITERIA} <span className="sr-only">(current)</span></a>
@@ -87,7 +78,7 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.state.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
+                        <li className={this.props.elementVisibility.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
                             onClick={() => this.props.toggleElementVisibilityHandler(Constants.OTHER_OPTIONS)}
                         >
                             <a className="nav-link" href="#">{Constants.OTHER_OPTIONS} <span className="sr-only">(current)</span></a>
@@ -101,10 +92,6 @@ class MenuBar extends Component {
                         Run Query
                     </button>
 
-                    {/*<form className="form-inline my-2 my-lg-0">*/}
-                    {/*    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>*/}
-                    {/*    <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>*/}
-                    {/*</form>*/}
                 </div>
             </nav>
         );

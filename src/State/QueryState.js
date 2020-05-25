@@ -57,6 +57,8 @@ class QueryState extends Component {
         this.updateCriterion.bind(this);
         this.deleteCriterion.bind(this);
         this.runQuery.bind(this);
+        this.onAddJoinColumnClickHandler.bind(this);
+        this.onDeleteJoinColumnClickHandler.bind(this);
     }
 
     componentDidMount() {
@@ -107,20 +109,20 @@ class QueryState extends Component {
         this.getAvailableColumns(this.state.selectedSchemas[0].schemaName, newSelectedTableNames);
     };
 
-    getAvailableTables(schemaName) {
-        this.setState({ isLoading: true });
-
-        fetch(`http://localhost:8000/metadata/querybuilder4j/${schemaName}/table-and-view`)
-            .then(response => response.json())
-            .then(tables => {
-                console.log(tables);
-
-                let newState = Object.assign({}, this.state);
-                newState.availableTables = tables;
-                newState.isLoading = false;
-                this.setState(newState);
-            });
-    }
+    // getAvailableTables(schemaName) {
+    //     this.setState({ isLoading: true });
+    //
+    //     fetch(`http://localhost:8000/metadata/querybuilder4j/${schemaName}/table-and-view`)
+    //         .then(response => response.json())
+    //         .then(tables => {
+    //             console.log(tables);
+    //
+    //             let newState = Object.assign({}, this.state);
+    //             newState.availableTables = tables;
+    //             newState.isLoading = false;
+    //             this.setState(newState);
+    //         });
+    // }
 
     getAvailableColumns(schemaName, tables) {
         this.setState({ isLoading: true });
@@ -175,150 +177,182 @@ class QueryState extends Component {
         this.setState({offset: newOffset});
     };
 
-    onAddJoinClickHandler = () => {
-        let defaultTableObject = '';
-        if (this.state.availableTables.length > 0) {
-            defaultTableObject = this.state.availableTables[0];
-        }
-
-        let newState = Object.assign({}, this.state);
-        newState.joins.push({
-            joinType: Constants.JOIN_IMAGES[0].name,
-            parentTable: defaultTableObject,
-            targetTable: defaultTableObject,
-            parentJoinColumns: [],
-            targetJoinColumns: [],
-            metadata: {
-                id: newState.joins.length,
-                joinImageUrl: Constants.JOIN_IMAGES[0].image,
-                availableColumns: {
-                    parentColumns: [],
-                    targetColumns: []
-                }
-            }
-        });
-
-        this.setState(newState);
-    };
-
-    onDeleteJoinHandler = (joinId) => {
-        joinId = parseInt(joinId);
-
-        // Create new array of joins that excludes the id being deleted.
-        let newJoins = Object.assign([], this.state.joins);
-        newJoins = newJoins.filter(join => join.metadata.id !== joinId);
-
-        // Renumber join ids.
-        for (let i=0; i<newJoins.length; i++) {
-            newJoins[i].metadata.id = i;
-        }
-
-        this.setState({ joins: newJoins });
-    };
-
-    onJoinImageClickHandler = (joinId) => {
-        // Get next join image based on currentJoinType.
-        joinId = parseInt(joinId);
-        let currentJoinType = this.state.joins.find(join => join.metadata.id === joinId).joinType;
-
-        let currentJoinTypeIndex;
-        for (let i=0; i<Constants.JOIN_IMAGES.length; i++) {
-            let join = Constants.JOIN_IMAGES[i];
-            if (join.name === currentJoinType) {
-                currentJoinTypeIndex = i;
-                break;
-            }
-        }
-
-        let nextJoinType;
-        let nextJoinImageUrl;
-        try {
-            nextJoinType = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].name;
-            nextJoinImageUrl = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].image;
-        } catch (e) {
-            nextJoinType = Constants.JOIN_IMAGES[0].name; // Default to first item in case of index out of range exception.
-            nextJoinImageUrl = Constants.JOIN_IMAGES[0].image; // Default to first item in case of index out of range exception.
-        }
-
-        // Copy state
-        let newState = Object.assign({}, this.state);
-        newState.joins.forEach(join => {
-            if (join.metadata.id === joinId) {
-                join.joinType = nextJoinType;
-                join.metadata.joinImageUrl = nextJoinImageUrl;
-            }
-        });
-
-        this.setState(newState);
-    };
-
-    onJoinTableChangeHandler = (joinId, parentTableEl, targetTableEl) => {
-        let parentTableName = Utils.getSelectedOptions(document.getElementById(parentTableEl))[0];
-        let parentTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
-
-        let targetTableName = Utils.getSelectedOptions(document.getElementById(targetTableEl))[0];
-        let targetTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === targetTableName; });
-
-        let newJoins = Object.assign([], this.state.joins);
-
-        newJoins.forEach(join => {
-            if (join.metadata.id === joinId) {
-
-                // Update join's parent and target tables.
-                join.parentTable = parentTableObject;
-                join.targetTable = targetTableObject;
-
-                // Update join's parentJoinColumns and targetJoinColumns
-                if (join.parentJoinColumns.length === 0) {
-                    join.parentJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
-                        return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
-                    }));
-                }
-
-                if (join.targetJoinColumns.length === 0) {
-                    join.targetJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
-                        return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
-                    }));
-                }
-
-                // Get available parent columns for this join.
-                join.metadata.availableColumns.parentColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
-                    return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
-                });
-
-                // Get available target columns for this join.
-                join.metadata.availableColumns.targetColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
-                    return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
-                });
-            }
-        });
-
-        // Update state.
-        this.setState({ joins: newJoins });
-    };
-
-    onJoinColumnChangeHandler = (joinId, parentColumnElName, targetColumnElName) => {
-        // Get join columns index.
-        let parentColumnEl = document.getElementById(parentColumnElName);
-        let index = parseInt(parentColumnEl.getAttribute('data-index'));
-
-        let parentColumn = Utils.getSelectedOptions(document.getElementById(parentColumnElName))[0];
-        let parentColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === parentColumn; });
-
-        let targetColumn = Utils.getSelectedOptions(document.getElementById(targetColumnElName))[0];
-        let targetColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === targetColumn; });
-
-        let newJoins = Object.assign([], this.state.joins);
-
-        newJoins.forEach(join => {
-            if (join.metadata.id === joinId) {
-                join.parentJoinColumns.splice(index, 1, parentColumnObject);
-                join.targetJoinColumns.splice(index, 1, targetColumnObject);
-            }
-        });
-
-        this.setState({ joins: newJoins });
-    };
+    // onAddJoinClickHandler = () => {
+    //     let defaultTableObject = '';
+    //     if (this.state.availableTables.length > 0) {
+    //         defaultTableObject = this.state.availableTables[0];
+    //     }
+    //
+    //     let newState = Object.assign({}, this.state);
+    //     newState.joins.push({
+    //         joinType: Constants.JOIN_IMAGES[0].name,
+    //         parentTable: defaultTableObject,
+    //         targetTable: defaultTableObject,
+    //         parentJoinColumns: [],
+    //         targetJoinColumns: [],
+    //         metadata: {
+    //             id: newState.joins.length,
+    //             joinImageUrl: Constants.JOIN_IMAGES[0].image,
+    //             availableColumns: {
+    //                 parentColumns: [],
+    //                 targetColumns: []
+    //             }
+    //         }
+    //     });
+    //
+    //     this.setState(newState);
+    // };
+    //
+    // onDeleteJoinHandler = (joinId) => {
+    //     joinId = parseInt(joinId);
+    //
+    //     // Create new array of joins that excludes the id being deleted.
+    //     let newJoins = Object.assign([], this.state.joins);
+    //     newJoins = newJoins.filter(join => join.metadata.id !== joinId);
+    //
+    //     // Renumber join ids.
+    //     for (let i=0; i<newJoins.length; i++) {
+    //         newJoins[i].metadata.id = i;
+    //     }
+    //
+    //     this.setState({ joins: newJoins });
+    // };
+    //
+    // onJoinImageClickHandler = (joinId) => {
+    //     // Get next join image based on currentJoinType.
+    //     joinId = parseInt(joinId);
+    //     let currentJoinType = this.state.joins.find(join => join.metadata.id === joinId).joinType;
+    //
+    //     let currentJoinTypeIndex;
+    //     for (let i=0; i<Constants.JOIN_IMAGES.length; i++) {
+    //         let join = Constants.JOIN_IMAGES[i];
+    //         if (join.name === currentJoinType) {
+    //             currentJoinTypeIndex = i;
+    //             break;
+    //         }
+    //     }
+    //
+    //     let nextJoinType;
+    //     let nextJoinImageUrl;
+    //     try {
+    //         nextJoinType = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].name;
+    //         nextJoinImageUrl = Constants.JOIN_IMAGES[currentJoinTypeIndex + 1].image;
+    //     } catch (e) {
+    //         nextJoinType = Constants.JOIN_IMAGES[0].name; // Default to first item in case of index out of range exception.
+    //         nextJoinImageUrl = Constants.JOIN_IMAGES[0].image; // Default to first item in case of index out of range exception.
+    //     }
+    //
+    //     // Copy state
+    //     let newState = Object.assign({}, this.state);
+    //     newState.joins.forEach(join => {
+    //         if (join.metadata.id === joinId) {
+    //             join.joinType = nextJoinType;
+    //             join.metadata.joinImageUrl = nextJoinImageUrl;
+    //         }
+    //     });
+    //
+    //     this.setState(newState);
+    // };
+    //
+    // onJoinTableChangeHandler = (joinId, parentTableEl, targetTableEl) => {
+    //     let parentTableName = Utils.getSelectedOptions(document.getElementById(parentTableEl))[0];
+    //     let parentTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
+    //
+    //     let targetTableName = Utils.getSelectedOptions(document.getElementById(targetTableEl))[0];
+    //     let targetTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === targetTableName; });
+    //
+    //     let newJoins = Object.assign([], this.state.joins);
+    //
+    //     newJoins.forEach(join => {
+    //         if (join.metadata.id === joinId) {
+    //
+    //             // Update join's parent and target tables.
+    //             join.parentTable = parentTableObject;
+    //             join.targetTable = targetTableObject;
+    //
+    //             // Update join's parentJoinColumns and targetJoinColumns
+    //             if (join.parentJoinColumns.length === 0) {
+    //                 join.parentJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+    //                     return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
+    //                 }));
+    //             }
+    //
+    //             if (join.targetJoinColumns.length === 0) {
+    //                 join.targetJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+    //                     return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
+    //                 }));
+    //             }
+    //
+    //             // Get available parent columns for this join.
+    //             join.metadata.availableColumns.parentColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
+    //                 return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
+    //             });
+    //
+    //             // Get available target columns for this join.
+    //             join.metadata.availableColumns.targetColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
+    //                 return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
+    //             });
+    //         }
+    //     });
+    //
+    //     // Update state.
+    //     this.setState({ joins: newJoins });
+    // };
+    //
+    // onJoinColumnChangeHandler = (joinId, parentColumnElName, targetColumnElName) => {
+    //     // Get join columns index.
+    //     let parentColumnEl = document.getElementById(parentColumnElName);
+    //     let index = parseInt(parentColumnEl.getAttribute('data-index'));
+    //
+    //     let parentColumn = Utils.getSelectedOptions(document.getElementById(parentColumnElName))[0];
+    //     let parentColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === parentColumn; });
+    //
+    //     let targetColumn = Utils.getSelectedOptions(document.getElementById(targetColumnElName))[0];
+    //     let targetColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === targetColumn; });
+    //
+    //     let newJoins = Object.assign([], this.state.joins);
+    //
+    //     newJoins.forEach(join => {
+    //         if (join.metadata.id === joinId) {
+    //             join.parentJoinColumns.splice(index, 1, parentColumnObject);
+    //             join.targetJoinColumns.splice(index, 1, targetColumnObject);
+    //         }
+    //     });
+    //
+    //     this.setState({ joins: newJoins });
+    // };
+    //
+    // onAddJoinColumnClickHandler = (joinId) => {
+    //     let newJoins = Object.assign([], this.state.joins);
+    //
+    //     newJoins.forEach(join => {
+    //         // Get first available parent column and first available target column.
+    //         let firstAvailableParentColumn = join.parentJoinColumns[0];
+    //         let firstAvailableTargetColumn = join.targetJoinColumns[0];
+    //
+    //         // Add first available parent column and first available target column as another item at the end of the array.
+    //         if (join.metadata.id === joinId) {
+    //             join.parentJoinColumns.push(firstAvailableParentColumn);
+    //             join.targetJoinColumns.push(firstAvailableTargetColumn);
+    //         }
+    //     });
+    //
+    //     this.setState({ joins: newJoins });
+    // };
+    //
+    // onDeleteJoinColumnClickHandler = (joinId, joinColumnIndex) => {
+    //     let newJoins = Object.assign([], this.state.joins);
+    //
+    //     newJoins.forEach(join => {
+    //         if (join.metadata.id === joinId) {
+    //             // Remove the parent join column and target join column at the joinColumnIndex.
+    //             join.parentJoinColumns.splice(joinColumnIndex, 1);
+    //             join.targetJoinColumns.splice(joinColumnIndex, 1)
+    //         }
+    //     });
+    //
+    //     this.setState({ joins: newJoins });
+    // };
 
     addCriterion = (parentId) => {
         // Copy the state's criteria to a new array.
@@ -491,9 +525,9 @@ class QueryState extends Component {
         return (
             <div>
                 <MenuBar
-                    elementVisibility={this.state.elementsVisibility}
-                    toggleElementVisibilityHandler={this.toggleElementVisibilityHandler}
-                    runQueryHandler={this.runQuery}
+                    // elementVisibility={this.state.elementsVisibility}
+                    // toggleElementVisibilityHandler={this.toggleElementVisibilityHandler}
+                    // runQueryHandler={this.runQuery}
                 >
                 </MenuBar>
 
@@ -507,6 +541,8 @@ class QueryState extends Component {
                     onJoinTableChangeHandler={this.onJoinTableChangeHandler}
                     availableColumns={this.state.joinAvailableColumns}
                     onJoinColumnChangeHandler={this.onJoinColumnChangeHandler}
+                    onAddJoinColumnClickHandler={this.onAddJoinColumnClickHandler}
+                    onDeleteJoinColumnClickHandler={this.onDeleteJoinColumnClickHandler}
                 >
                 </Joins>
 

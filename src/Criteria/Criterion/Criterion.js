@@ -75,7 +75,7 @@ class Criterion extends React.Component {
                        onClick={() => this.props.deleteCriterionHandler(criterion.id)}
                 />
 
-                <input type="button" id={`columnMembers-${criterion.id}`} value="Column Members"
+                <input type="button" id={`columnMembers-${criterion.id}`} value="Column Values"
                        className="criteria-add-remove-buttons"/>
             </div>
         );

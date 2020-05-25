@@ -1,11 +1,24 @@
 import React, { Component } from 'react';
 import './SchemasAndTables.css';
+import {connect} from "react-redux";
+import { store } from '../index';
+import * as Utils from "../Utils/Utils";
 
 
 class SchemasAndTables extends Component {
 
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        // Get available schemas.
+        fetch('http://localhost:8000/metadata/querybuilder4j/schema')
+            .then(response => response.json())
+            .then(schemas => {
+                console.log(schemas);
+                this.props.getAvailableSchemasHandler(schemas)
+            });
     }
 
     render() {
@@ -15,6 +28,8 @@ class SchemasAndTables extends Component {
             availableSchemas.push(
                 <option key={schema.fullyQualifiedName}
                         value={schema.fullyQualifiedName}
+                        selected={this.props.selectedSchemas.includes(schema)}
+                        onClick={() => this.props.onSelectSchemaHandler(schema.fullyQualifiedName)}
                 >
                     {schema.schemaName}
                 </option>
@@ -61,7 +76,7 @@ class SchemasAndTables extends Component {
                 <div id="tablesDiv" className="tables-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="table">Tables</label>
                     <select id="table" name="table" multiple={true} size="30"
-                            onChange={this.props.selectTablesHandler}
+                            onChange={(event) => this.props.onSelectTableHandler(event.target)}
                     >
                         {availableTables}
                     </select>
@@ -72,4 +87,55 @@ class SchemasAndTables extends Component {
 
 }
 
-export default SchemasAndTables;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.query;
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getAvailableSchemasHandler: (availableSchemas) => dispatch({
+            type: 'UPDATE_AVAILABLE_SCHEMAS',
+            payload: {
+                availableSchemas: availableSchemas,
+                isLoading: false
+            }
+        }),
+        onSelectSchemaHandler: (schemaFullyQualifiedName) => {
+            // Get schema object that has been selected.
+            let selectedSchemaObjects = store.getState().query.availableSchemas.filter(schema => schemaFullyQualifiedName === schema.fullyQualifiedName);
+
+            // Create a string with the schema names joined together with `&` to be used in API call.
+            let joinedSchemaString = selectedSchemaObjects.map(schema => schema.schemaName).join('&');
+
+            fetch(`http://localhost:8000/metadata/querybuilder4j/${joinedSchemaString}/table-and-view`)
+                .then(response => response.json())
+                .then(tables => {
+                    console.log(tables);
+
+                    dispatch({ type: 'SELECT_SCHEMA', payload: { tables: tables} })
+                });
+        },
+        onSelectTableHandler: (target) => {
+            let newSelectedTableFullyQualifiedNames = Utils.getSelectedOptions(target);
+
+            // Get the table object for the table that was selected.
+            let allTables = store.getState().query.availableTables.filter(table => newSelectedTableFullyQualifiedNames.includes(table.fullyQualifiedName));
+
+            // Get table columns for all selected tables.
+            fetch(`http://localhost:8000//metadata/database/schema/table/column`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(allTables)
+            }).then(response => response.json())
+                .then(columns => {
+                    console.log(columns);
+
+                    dispatch( { type: 'SELECT_TABLE', payload: { selectedTables: allTables, availableColumns: columns } } )
+                });
+        }
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(SchemasAndTables);

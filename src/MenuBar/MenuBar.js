@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './MenuBar.css';
 import * as Constants from '../Config/Constants';
+import { connect } from 'react-redux'
 
 
 class MenuBar extends Component {
@@ -39,7 +40,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.QUERY_TEMPLATES)}
+                            onClick={this.props.toggleQueryTemplatesVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>
                         </li>
@@ -47,7 +48,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.SCHEMAS_AND_TABLES)}
+                            onClick={this.props.toggleSchemasAndTablesVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.SCHEMAS_AND_TABLES} <span className="sr-only">(current)</span></a>
                         </li>
@@ -55,7 +56,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.joinsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.JOINS)}
+                            onClick={this.props.toggleJoinsVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.JOINS} <span className="sr-only">(current)</span></a>
                         </li>
@@ -63,7 +64,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.columnsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.COLUMNS)}
+                            onClick={this.props.toggleColumnsVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.COLUMNS} <span className="sr-only">(current)</span></a>
                         </li>
@@ -71,7 +72,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.criteriaElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.CRITERIA)}
+                            onClick={this.props.toggleCriteriaVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.CRITERIA} <span className="sr-only">(current)</span></a>
                         </li>
@@ -79,7 +80,7 @@ class MenuBar extends Component {
                         <hr className="divider"/>
 
                         <li className={this.props.elementVisibility.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={() => this.props.toggleElementVisibilityHandler(Constants.OTHER_OPTIONS)}
+                            onClick={this.props.toggleOtherOptionsVisibility}
                         >
                             <a className="nav-link" href="#">{Constants.OTHER_OPTIONS} <span className="sr-only">(current)</span></a>
                         </li>
@@ -98,4 +99,19 @@ class MenuBar extends Component {
     }
 }
 
-export default MenuBar;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.menuBar;
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        toggleJoinsVisibility: () => dispatch({ type: Constants.JOINS }),
+        toggleSchemasAndTablesVisibility: () => dispatch({ type: Constants.SCHEMAS_AND_TABLES }),
+        toggleQueryTemplatesVisibility: () => dispatch({ type: Constants.QUERY_TEMPLATES }),
+        toggleColumnsVisibility: () => dispatch({ type: Constants.COLUMNS }),
+        toggleCriteriaVisibility: () => dispatch({ type: Constants.CRITERIA }),
+        toggleOtherOptionsVisibility: () => dispatch({ type: Constants.OTHER_OPTIONS })
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(MenuBar);

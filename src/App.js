@@ -4,6 +4,8 @@ import MenuBar from "./MenuBar/MenuBar";
 import Joins from "./Joins/Joins";
 import { connect } from 'react-redux'
 import SchemasAndTables from "./SchemasAndTables/SchemasAndTables";
+import Columns from "./Columns/Columns";
+import OtherOptions from "./OtherOptions/OtherOptions";
 
 
 const App = (props) => {
@@ -21,6 +23,16 @@ const App = (props) => {
                 availableSchemas={props.query.availableSchemas}
                 availableTables={props.query.availableTables}
                 selectedTables={props.query.selectedTables}
+            />
+
+            <Columns
+                hidden={props.menuBar.elementVisibility.columnsElementHidden.toString()}
+                availableColumns={props.query.availableColumns}
+                selectedColumns={props.query.selectedColumns}
+            />
+
+            <OtherOptions
+                hidden={props.menuBar.elementVisibility.otherOptionsElementHidden.toString()}
             />
 
         </div>

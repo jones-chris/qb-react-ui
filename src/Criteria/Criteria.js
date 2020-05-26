@@ -27,7 +27,7 @@ class Criteria extends React.Component {
         return (
             <div id="criteria" className="criteria-div" hidden={this.props.hidden === 'true'}>
 
-                <button id="addRootCriteriaButton" name="addRootCriteriaButton" type="button" className="add-root-criteria-button"
+                <button id="addRootCriteriaButton" type="button" className="add-root-criteria-button"
                         onClick={() => this.props.addCriterionHandler(null)}>
                     Add Root Criterion
                 </button>

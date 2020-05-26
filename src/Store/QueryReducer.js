@@ -1,5 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep';
-
 const initialState = {
     availableSchemas: [],
     selectedSchemas: [],
@@ -32,6 +30,36 @@ const queryReducer = (state = initialState, action) => {
                 ...state,
                 selectedTables: action.payload.selectedTables,
                 availableColumns: action.payload.availableColumns
+            };
+        case 'ADD_SELECTED_COLUMN':
+            return {
+                ...state,
+                selectedColumns: action.payload.selectedColumns
+            };
+        case 'REMOVE_SELECTED_COLUMN':
+            return {
+                ...state,
+                selectedColumns: action.payload.selectedColumns
+            };
+        case 'UPDATE_DISTINCT':
+            return {
+                ...state,
+                distinct: ! state.distinct
+            };
+        case 'UPDATE_SUPPRESS_NULLS':
+            return {
+                ...state,
+                suppressNulls: ! state.suppressNulls
+            };
+        case 'UPDATE_LIMIT':
+            return {
+                ...state,
+                limit: action.payload.newLimit
+            };
+        case 'UPDATE_OFFSET':
+            return {
+                ...state,
+                offset: action.payload.newOffset
             };
         default:
             return state;

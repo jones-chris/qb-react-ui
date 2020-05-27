@@ -61,6 +61,16 @@ const queryReducer = (state = initialState, action) => {
                 ...state,
                 offset: action.payload.newOffset
             };
+        case 'ADD_CRITERIA':
+            return {
+                ...state,
+                criteria: action.payload.newCriteria
+            };
+        case 'UPDATE_CRITERIA':
+            return {
+                ...state,
+                criteria: action.payload.newCriteria
+            };
         default:
             return state;
     }

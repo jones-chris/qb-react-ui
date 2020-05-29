@@ -6,6 +6,7 @@ const initialState = {
     availableColumns: [],
     selectedColumns: [],
     criteria: [],
+    joins: [],
     distinct: false,
     suppressNulls: false,
     limit: 10,

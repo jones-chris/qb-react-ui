@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './MenuBar.css';
 import * as Constants from '../Config/Constants';
 import { connect } from 'react-redux'
+import { store } from "../index";
 
 
 class MenuBar extends Component {
@@ -9,6 +10,52 @@ class MenuBar extends Component {
     constructor(props) {
         super(props);
     }
+
+    onRunQueryHandler = () => {
+        const currentQueryState = store.getState().query;
+
+        // Put selected columns in the format the API is expecting.
+        // todo:  change this once the qb4j library, backend, and front end all use the same schema.
+        let selectedColumns = [];
+        for (let column of currentQueryState.selectedColumns) {
+            selectedColumns.push({
+                fullyQualifiedName: column.tableName + '.' + column.columnName,
+                alias: ''
+            });
+        }
+
+        // Determine parent table.
+        let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
+        let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
+
+        // Build statement object
+        let statement = {
+            name: '',
+            columns: selectedColumns,
+            table: parentTable.tableName, // todo:  pass entire parentTable object to API when object structures are standardized across library, backend, and frontend.
+            criteria: currentQueryState.criteria,
+            joins: currentQueryState.joins,
+            distinct: currentQueryState.distinct,
+            groupBy: false,
+            orderBy: false,
+            limit: currentQueryState.limit,
+            ascending: currentQueryState.ascending,
+            offset: currentQueryState.offset,
+            suppressNulls: currentQueryState.suppressNulls
+        };
+
+        console.log(statement);
+
+        // Send request to API.
+        fetch('http://localhost:8000/data/querybuilder4j/query', {
+            method: 'POST',
+            body: JSON.stringify(statement),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+            .then(json => console.log(json));
+    };
 
     render() {
         return (
@@ -88,7 +135,7 @@ class MenuBar extends Component {
                     </ul>
 
                     <button className="btn btn-outline-primary my-2 my-sm-0"
-                            onClick={this.props.runQueryHandler}
+                            onClick={this.onRunQueryHandler}
                     >
                         Run Query
                     </button>

@@ -141,34 +141,6 @@ const mapDispatchToProps = (dispatch) => {
             });
 
             dispatch({ type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } });
-
-            // // Renumber remaining criteria.
-            // for (let i=0; i<newCriteria.length; i++) {
-            //     let criterion = newCriteria[i];
-            //
-            //     criterion.id = i;
-            //
-            //     // If criterion is new first root criteria, then set parent id and level.
-            //     if (criterion.id === 0) {
-            //         criterion.parentId = null;
-            //         criterion.metadata.level = 0;
-            //     }
-            //
-            //     // If the 0th criterion was not deleted, then set the criterion's parentId to the previous criterion from
-            //     // what it currently is.
-            //
-            //     // If the criterion's parent id is equal or greater than the criterion that was deleted, then reduce parentId
-            //     // by 1.
-            //     if (criterion.parentId !== null && criterion.parentId >= criterionId) {
-            //         criterion.parentId = parseInt(criterion.parentId) - 1;
-            //
-            //         // Get the new criterion's level.  This will be the parent criterion's level plus 1.
-            //         let parentCriterion = this.state.criteria.find(crit => crit.id === criterion.parentId);
-            //         criterion.metadata.level = parentCriterion.metadata.level + 1;
-            //     }
-            // }
-
-            // this.setState({criteria: newCriteria});
         }
     }
 };

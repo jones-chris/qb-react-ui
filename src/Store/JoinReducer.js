@@ -2,6 +2,7 @@ import * as Constants from "../Config/Constants";
 import cloneDeep from 'lodash/cloneDeep';
 import * as Utils from "../Utils/Utils";
 
+
 const initialState = {
     joins: []
 };
@@ -90,40 +91,42 @@ const joinReducer = (state = initialState, action) => {
             };
         case 'CHANGE_TABLE':
             let parentTableName = Utils.getSelectedOptions(document.getElementById(action.payload.parentTableElementName))[0];
-            let parentTableObject = state.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
+            let parentTableObject = action.payload.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
 
             let targetTableName = Utils.getSelectedOptions(document.getElementById(action.payload.targetTableElementName))[0];
-            let targetTableObject = this.state.availableTables.find(table => { return table.fullyQualifiedName === targetTableName; });
+            let targetTableObject = action.payload.availableTables.find(table => { return table.fullyQualifiedName === targetTableName; });
 
             newJoins.forEach(join => {
-                if (join.metadata.id === joinId) {
+                if (join.metadata.id === action.payload.joinId) {
 
                     // Update join's parent and target tables.
                     join.parentTable = parentTableObject;
                     join.targetTable = targetTableObject;
 
-                    // Update join's parentJoinColumns and targetJoinColumns
-                    if (join.parentJoinColumns.length === 0) {
-                        join.parentJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                    if (action.payload.availableColumns.length !== 0) {
+                        // Update join's parentJoinColumns and targetJoinColumns
+                        if (join.parentJoinColumns.length === 0) {
+                            join.parentJoinColumns.push(action.payload.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                                return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
+                            }));
+                        }
+
+                        if (join.targetJoinColumns.length === 0) {
+                            join.targetJoinColumns.push(action.payload.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                                return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
+                            }));
+                        }
+
+                        // Get available parent columns for this join.
+                        join.metadata.availableColumns.parentColumns = action.payload.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
                             return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
-                        }));
-                    }
+                        });
 
-                    if (join.targetJoinColumns.length === 0) {
-                        join.targetJoinColumns.push(this.state.availableColumns.find(column => {  // find() because we just need first item that meets criteria.
+                        // Get available target columns for this join.
+                        join.metadata.availableColumns.targetColumns = action.payload.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
                             return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
-                        }));
+                        });
                     }
-
-                    // Get available parent columns for this join.
-                    join.metadata.availableColumns.parentColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
-                        return column.databaseName === parentTableObject.databaseName && column.schemaName === parentTableObject.schemaName && column.tableName === parentTableObject.tableName;
-                    });
-
-                    // Get available target columns for this join.
-                    join.metadata.availableColumns.targetColumns = this.state.availableColumns.filter(column => {  // filter() because we need all items that meets criteria.
-                        return column.databaseName === targetTableObject.databaseName && column.schemaName === targetTableObject.schemaName && column.tableName === targetTableObject.tableName;
-                    });
                 }
             });
 
@@ -136,13 +139,13 @@ const joinReducer = (state = initialState, action) => {
             let index = parseInt(parentColumnEl.getAttribute('data-index'));
 
             let parentColumn = Utils.getSelectedOptions(parentColumnEl)[0];
-            let parentColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === parentColumn; });
+            let parentColumnObject = action.payload.availableColumns.find(column => { return column.fullyQualifiedName === parentColumn; });
 
             let targetColumn = Utils.getSelectedOptions(document.getElementById(action.payload.targetJoinColumnsElementId))[0];
-            let targetColumnObject = this.state.availableColumns.find(column => { return column.fullyQualifiedName === targetColumn; });
+            let targetColumnObject = action.payload.availableColumns.find(column => { return column.fullyQualifiedName === targetColumn; });
 
             newJoins.forEach(join => {
-                if (join.metadata.id === joinId) {
+                if (join.metadata.id === action.payload.joinId) {
                     join.parentJoinColumns.splice(index, 1, parentColumnObject);
                     join.targetJoinColumns.splice(index, 1, targetColumnObject);
                 }
@@ -159,7 +162,7 @@ const joinReducer = (state = initialState, action) => {
                 let firstAvailableTargetColumn = join.targetJoinColumns[0];
 
                 // Add first available parent column and first available target column as another item at the end of the array.
-                if (join.metadata.id === joinId) {
+                if (join.metadata.id === action.payload.joinId) {
                     join.parentJoinColumns.push(firstAvailableParentColumn);
                     join.targetJoinColumns.push(firstAvailableTargetColumn);
                 }
@@ -171,7 +174,7 @@ const joinReducer = (state = initialState, action) => {
             };
         case 'DELETE_JOIN_COLUMN':
             newJoins.forEach(join => {
-                if (join.metadata.id === joinId) {
+                if (join.metadata.id === action.payload.joinId) {
                     // Remove the parent join column and target join column at the joinColumnIndex.
                     join.parentJoinColumns.splice(action.payload.joinColumnIndex, 1);
                     join.targetJoinColumns.splice(action.payload.joinColumnIndex, 1)

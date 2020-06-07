@@ -17,22 +17,16 @@ const App = (props) => {
             {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
             <Joins
                 hidden={props.menuBar.elementVisibility.joinsElementHidden.toString()}
-                joins={props.joins.joins}
             />
 
             {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
             <SchemasAndTables
                 hidden={props.menuBar.elementVisibility.schemasAndTablesElementHidden.toString()}
-                availableSchemas={props.query.availableSchemas}
-                availableTables={props.query.availableTables}
-                selectedTables={props.query.selectedTables}
             />
 
             {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
             <Columns
                 hidden={props.menuBar.elementVisibility.columnsElementHidden.toString()}
-                availableColumns={props.query.availableColumns}
-                selectedColumns={props.query.selectedColumns}
             />
 
             <OtherOptions

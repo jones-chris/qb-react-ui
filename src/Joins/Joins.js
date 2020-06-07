@@ -157,7 +157,7 @@ class Joins extends Component {
 
 const mapReduxStateToProps = (reduxState) => {
     let props = reduxState.joins;
-    props['availableTables'] = reduxState.query.availableTables;
+    props['availableTables'] = reduxState.query.selectedTables;
     return props;
 };
 
@@ -186,7 +186,9 @@ const mapDispatchToProps = (dispatch) => {
             payload: {
                 joinId: joinId,
                 parentTableElementName: parentTableElementName,
-                targetTableElementName: targetTableElementName
+                targetTableElementName: targetTableElementName,
+                availableTables: store.getState().query.selectedTables,
+                availableColumns: store.getState().query.availableColumns
             }
         }),
         changeColumn: (joinId, parentJoinColumnsElementId, targetJoinColumnsElementId) => dispatch({
@@ -194,7 +196,8 @@ const mapDispatchToProps = (dispatch) => {
             payload: {
                 joinId: joinId,
                 parentJoinColumnsElementId: parentJoinColumnsElementId,
-                targetJoinColumnsElementId: targetJoinColumnsElementId
+                targetJoinColumnsElementId: targetJoinColumnsElementId,
+                availableColumns: store.getState().query.availableColumns
             }
         }),
         addJoinColumn: (joinId) => dispatch({

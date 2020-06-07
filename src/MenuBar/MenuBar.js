@@ -47,7 +47,8 @@ class MenuBar extends Component {
         console.log(statement);
 
         // Send request to API.
-        fetch('http://localhost:8000/data/querybuilder4j/query', {
+        let apiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/query`;
+        fetch(apiUrl, {
             method: 'POST',
             body: JSON.stringify(statement),
             headers: {

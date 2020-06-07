@@ -13,7 +13,8 @@ class SchemasAndTables extends Component {
 
     componentDidMount() {
         // Get available schemas.
-        fetch('http://localhost:8000/metadata/querybuilder4j/schema')
+        let apiUrl = `${store.getState().config.baseApiUrl}/metadata/querybuilder4j/schema`;
+        fetch(apiUrl)
             .then(response => response.json())
             .then(schemas => {
                 console.log(schemas);
@@ -107,7 +108,8 @@ const mapDispatchToProps = (dispatch) => {
             // Create a string with the schema names joined together with `&` to be used in API call.
             let joinedSchemaString = selectedSchemaObjects.map(schema => schema.schemaName).join('&');
 
-            fetch(`http://localhost:8000/metadata/querybuilder4j/${joinedSchemaString}/table-and-view`)
+            let apiUrl = `${store.getState().config.baseApiUrl}/metadata/querybuilder4j/${joinedSchemaString}/table-and-view`;
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(tables => {
                     console.log(tables);
@@ -122,7 +124,8 @@ const mapDispatchToProps = (dispatch) => {
             let allTables = store.getState().query.availableTables.filter(table => newSelectedTableFullyQualifiedNames.includes(table.fullyQualifiedName));
 
             // Get table columns for all selected tables.
-            fetch(`http://localhost:8000//metadata/database/schema/table/column`,{
+            let apiUrl = `${store.getState().config.baseApiUrl}/metadata/database/schema/table/column`;
+            fetch(apiUrl,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

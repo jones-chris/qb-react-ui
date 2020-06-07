@@ -8,9 +8,11 @@ import menuBarReducer from "./Store/MenuBarReducer";
 import joinReducer from './Store/JoinReducer';
 import queryReducer from "./Store/QueryReducer";
 import { Provider } from 'react-redux'
+import configReducer from "./Store/ConfigReducer";
 
 export const store = createStore(combineReducers(
     {
+        config: configReducer,
         menuBar: menuBarReducer,
         joins: joinReducer,
         query: queryReducer

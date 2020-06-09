@@ -1,7 +1,8 @@
 import * as React from "react";
 import './Columns.css';
 import * as Utils from '../Utils/Utils';
-import * as Constants from '../Config/Constants';
+import { connect } from "react-redux";
+import { store } from '../index';
 
 class Columns extends React.Component {
 
@@ -50,14 +51,14 @@ class Columns extends React.Component {
                 <div id="addRemoveColumns" className="available-columns-buttons-div">
                     <button id="addColumnsButton" name="addColumnsButton" type="button"
                             className="available-columns-add-button"
-                            onClick={() => this.props.selectColumnsHandler(Constants.ADD)}
+                            onClick={this.props.onAddSelectedColumnHandler}
                     >&#8594;</button>
 
                     <br/>
 
                     <button id="removeColumnsButton" name="removeColumnsButton" type="button"
                             className="available-columns-remove-button"
-                            onClick={() => this.props.selectColumnsHandler(Constants.REMOVE)}
+                            onClick={this.props.onRemoveSelectedColumnHandler}
                     >&#8592;</button>
                 </div>
 
@@ -73,4 +74,34 @@ class Columns extends React.Component {
 
 }
 
-export default Columns;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.query;
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onAddSelectedColumnHandler: () => {
+            let availableColumnsSelectElement = document.getElementById('availableColumns');
+            let newSelectedColumnsFullyQualifiedNames = Utils.getSelectedOptions(availableColumnsSelectElement);
+
+            // Get the column JSON object based on newSelectedColumns, which is an array of the column fullyQualifiedNames.
+            let newSelectedColumns = store.getState().query.availableColumns.filter(column => {
+                return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
+            });
+
+            dispatch({ type: 'ADD_SELECTED_COLUMN', payload: { selectedColumns: newSelectedColumns } });
+        },
+        onRemoveSelectedColumnHandler: () => {
+            let selectedColumnsSelectElement = document.getElementById('columns');
+            let fullyQualifiedColumnsNamesToRemove = Utils.getSelectedOptions(selectedColumnsSelectElement);
+
+            let newSelectedColumns = store.getState().query.selectedColumns.filter(column => {
+                return ! fullyQualifiedColumnsNamesToRemove.includes(column.fullyQualifiedName);
+            });
+
+            dispatch({ type: 'REMOVE_SELECTED_COLUMN', payload: { selectedColumns: newSelectedColumns } });
+        }
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(Columns);

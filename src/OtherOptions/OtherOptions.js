@@ -1,5 +1,6 @@
 import React from 'react';
 import './OtherOptions.css'
+import { connect } from "react-redux";
 
 const OtherOptions = (props) => {
     return (
@@ -12,7 +13,7 @@ const OtherOptions = (props) => {
                             <input id="distinct"
                                    type="checkbox"
                                    checked={props.distinct}
-                                   onChange={(event) => props.distinctHandler(event.target.checked)}
+                                   onChange={props.onDistinctChangeHandler}
                             />
                         </td>
                     </tr>
@@ -22,7 +23,7 @@ const OtherOptions = (props) => {
                             <input id="suppressNulls"
                                    type="checkbox"
                                    checked={props.suppressNulls}
-                                   onChange={(event) => props.suppressNullsHandler(event.target.checked)}
+                                   onChange={props.onSuppressNullsChangeHandler}
                             />
                         </td>
                     </tr>
@@ -31,7 +32,7 @@ const OtherOptions = (props) => {
                         <td>
                             <select id="limit"
                                     value={props.limit}
-                                    onChange={(event) => props.limitHandler(event.target.value)}
+                                    onChange={(event) => props.onLimitChangeHandler(event.target.value)}
                             >
                                 <option value="">No Limit</option>
                                 <option value="10">10</option>
@@ -46,7 +47,7 @@ const OtherOptions = (props) => {
                         <td>
                             <select id="offset"
                                     value={props.offset}
-                                    onChange={(event) => props.offsetHandler(event.target.value)}
+                                    onChange={(event) => props.onOffsetChangeHandler(event.target.value)}
                             >
                                 <option value="">No Offset</option>
                                 <option value="10">10</option>
@@ -62,4 +63,17 @@ const OtherOptions = (props) => {
     );
 };
 
-export default OtherOptions;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.query;
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onDistinctChangeHandler: () => dispatch({ type: 'UPDATE_DISTINCT' }),
+        onSuppressNullsChangeHandler: () => dispatch({ type: 'UPDATE_SUPPRESS_NULLS' }),
+        onLimitChangeHandler: (newLimit) => dispatch({ type: 'UPDATE_LIMIT', payload: { newLimit: newLimit } }),
+        onOffsetChangeHandler: (newOffset) => dispatch({ type: 'UPDATE_OFFSET', payload: { newOffset: newOffset } })
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(OtherOptions);

@@ -1,6 +1,8 @@
 import React from 'react';
 import Criterion from "./Criterion/Criterion";
 import './Criteria.css';
+import { connect } from "react-redux";
+import { addCriterion } from "../actions/CriteriaActions";
 
 class Criteria extends React.Component {
 
@@ -16,9 +18,6 @@ class Criteria extends React.Component {
                     key={criterion.id}
                     criterion={criterion}
                     availableColumns={this.props.availableColumns}
-                    updateCriterionHandler={this.props.updateCriterionHandler}
-                    deleteCriterionHandler={this.props.deleteCriterionHandler}
-                    addCriterionHandler={this.props.addCriterionHandler}
                 >
                 </Criterion>
             )
@@ -27,16 +26,29 @@ class Criteria extends React.Component {
         return (
             <div id="criteria" className="criteria-div" hidden={this.props.hidden === 'true'}>
 
-                <button id="addRootCriteriaButton" name="addRootCriteriaButton" type="button" className="add-root-criteria-button"
-                        onClick={() => this.props.addCriterionHandler(null)}>
+                <button id="addRootCriteriaButton" type="button" className="add-root-criteria-button"
+                        onClick={() => this.props.onAddCriterionHandler(null)}>
                     Add Root Criterion
                 </button>
 
                 {criteriaJsx}
+
             </div>
         );
     }
 
 }
 
-export default Criteria;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.query;
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onAddCriterionHandler: (parentId, ) => {
+            dispatch(addCriterion(parentId));
+        }
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(Criteria);

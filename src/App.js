@@ -78,6 +78,8 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: 'ADD_BASE_API_URL',
                 payload: {
+                    parentWindow: window.parent,
+                    parentWindowUrl: document.location.ancestorOrigins[0],
                     baseApiUrl: urlParams.get('baseApiUrl'),
                     uiMessage: uiMessage
                 }

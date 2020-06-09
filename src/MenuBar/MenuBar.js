@@ -46,7 +46,7 @@ class MenuBar extends Component {
 
         console.log(statement);
 
-        // Send request to API.
+        // Send query to API.
         let apiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/query`;
         fetch(apiUrl, {
             method: 'POST',
@@ -55,7 +55,14 @@ class MenuBar extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(response => response.json())
-            .then(json => console.log(json));
+            .then(json => {
+                console.log(json);
+
+                // Send json to window's parent so the parent can choose what to do with the data.
+                let parentWindow = store.getState().config.parentWindow;
+                let parentWindowUrl = store.getState().config.parentWindowUrl;
+                parentWindow.postMessage(json, parentWindowUrl);
+            });
     };
 
     render() {

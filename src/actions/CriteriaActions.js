@@ -4,6 +4,9 @@ export const addCriterion = (parentId) => {
         // Copy the state's criteria to a new array.
         let newCriteria = [...store.getState().query.criteria];
 
+        // Current query state for read only reference.
+        let currentQueryState = store.getState().query;
+
         // Determine the id of the new criterion.  Assume we are adding a root criterion (id of 0).  Another way of thinking
         // about it is if parentId is null, then the new criterion id will be 0 (the top-most root).
         let id = 0;
@@ -29,16 +32,20 @@ export const addCriterion = (parentId) => {
             level = parentCriterion.metadata.level + 1;
         }
 
+        // Determine the criterion's column.
+        let column = null;
+        if (currentQueryState.availableColumns.length > 0) {
+            column = currentQueryState.availableColumns[0].tableName + '.' + currentQueryState.availableColumns[0].columnName;  // todo:  change this once qb4j accepts a column object.
+        }
+
         // Instantiate a new criterion model with the id and parent id.
         let criterion = {
             id: id,
             parentId: parentId,
-            conjunction: 'AND',
-            frontParenthesis: null,
-            column: null,
-            operator: null,
+            conjunction: 'And',
+            column: column,
+            operator: 'equalTo',
             filter: '',
-            endParenthesis: null,
             metadata: {
                 level: level
             }

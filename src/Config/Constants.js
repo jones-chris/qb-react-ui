@@ -15,19 +15,6 @@ export const CRITERIA = 'Criteria';
 export const OTHER_OPTIONS = 'Other Options';
 export const QUERY_TEMPLATES = 'Query Templates';
 
-// State names.
-export const AVAILABLE_SCHEMAS_STATE = 'availableSchemas';
-export const SELECTED_SCHEMAS_STATE = 'selectedSchemas';
-export const AVAILABLE_TABLES_STATE = 'availableTables';
-export const SELECTED_TABLES_STATE = 'selectedTables';
-export const AVAILABLE_COLUMNS_STATE = 'availableColumns';
-export const SELECTED_COLUMNS_STATE = 'selectedColumns';
-export const JOINS_STATE = 'joins';
-export const DISTINCT_STATE = 'distinct';
-export const SUPPRESS_NULLS_STATE = 'suppressNulls';
-export const LIMIT_STATE = 'limit';
-export const OFFSET_STATE = 'offset';
-
 // Join images.
 export const JOIN_IMAGES = [
     {'name': 'LEFT_EXCLUDING',         'image': leftJoinExcluding},
@@ -39,16 +26,7 @@ export const JOIN_IMAGES = [
     {'name': 'FULL_OUTER_EXCLUDING',   'image': fullOuterJoinExcluding}
 ];
 
-// Adding and removing columns.
-export const ADD = 'add';
-export const REMOVE = 'remove';
-
-// Join parent and target constants.
-export const PARENT = 'parent';
-export const TARGET = 'target';
-
 // Criterion model object attributes that can be updated.
-export const PARENT_ID = 'parentId';
 export const CONJUNCTION = 'conjunction';
 export const COLUMN = 'column';
 export const OPERATOR = 'operator';

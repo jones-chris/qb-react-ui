@@ -36,8 +36,8 @@ class Criterion extends React.Component {
                 <select id={`criteria${criterion.id}.conjunction`} name={`criteria[${criterion.id}].conjunction`} className="criteria-conjuction-and-operator"
                         onChange={(event) => this.props.onUpdateCriterionHandler(criterion.id, Constants.CONJUNCTION, event.target.value)}
                 >
-                    <option value="AND" selected={criterion.conjunction === 'AND'}>And</option>
-                    <option value="OR" selected={criterion.conjunction === 'OR'}>Or</option>
+                    <option value="And" selected={criterion.conjunction === 'And'}>And</option>
+                    <option value="Or" selected={criterion.conjunction === 'Or'}>Or</option>
                 </select>
 
                 <select id={`criteria${criterion.id}.column`} name={`criteria[${criterion.id}].column`} className="criteria-column-and-filter"

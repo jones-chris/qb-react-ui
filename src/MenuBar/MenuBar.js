@@ -13,6 +13,7 @@ class MenuBar extends Component {
 
     onRunQueryHandler = () => {
         const currentQueryState = store.getState().query;
+        const currentJoinState = store.getState().joins;
 
         // Put selected columns in the format the API is expecting.
         // todo:  change this once the qb4j library, backend, and front end all use the same schema.
@@ -28,13 +29,35 @@ class MenuBar extends Component {
         let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
         let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
 
+        // todo:  Prepare join objects for now but pass object without metadata later when object structures are standardized across library, backend, and front end.
+        let preparedJoins = [];
+        currentJoinState.joins.forEach(join => {
+            let preparedJoin = {
+                joinType: join.joinType,
+                parentTable: (join.parentTable.schemaName === 'null') ? join.parentTable.tableName : join.parentTable.schemaName + '.' + join.parentTable.tableName,
+                targetTable: (join.targetTable.schemaName === 'null') ? join.targetTable.tableName : join.targetTable.schemaName + '.' + join.targetTable.tableName,
+                parentJoinColumns: [],
+                targetJoinColumns: []
+            };
+
+            join.parentJoinColumns.forEach(parentJoinColumn => {
+                preparedJoin.parentJoinColumns.push(parentJoinColumn.tableName + '.' + parentJoinColumn.columnName);
+            });
+
+            join.targetJoinColumns.forEach(targetJoinColumn => {
+                preparedJoin.targetJoinColumns.push(targetJoinColumn.tableName + '.' + targetJoinColumn.columnName);
+            });
+
+            preparedJoins.push(preparedJoin);
+        });
+
         // Build statement object
         let statement = {
             name: '',
             columns: selectedColumns,
             table: parentTable.tableName, // todo:  pass entire parentTable object to API when object structures are standardized across library, backend, and frontend.
             criteria: currentQueryState.criteria,
-            joins: currentQueryState.joins,
+            joins: preparedJoins,
             distinct: currentQueryState.distinct,
             groupBy: false,
             orderBy: false,

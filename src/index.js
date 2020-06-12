@@ -9,13 +9,15 @@ import joinReducer from './Store/JoinReducer';
 import queryReducer from "./Store/QueryReducer";
 import { Provider } from 'react-redux'
 import configReducer from "./Store/ConfigReducer";
+import modalReducer from './Store/ModalReducer';
 
 export const store = createStore(combineReducers(
     {
         config: configReducer,
         menuBar: menuBarReducer,
         joins: joinReducer,
-        query: queryReducer
+        query: queryReducer,
+        modal: modalReducer
     }
 ));
 

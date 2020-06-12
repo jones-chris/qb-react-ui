@@ -1,4 +1,5 @@
 import React from "react";
+import './ColumnValues.css';
 
 class ColumnValues extends React.Component {
 
@@ -8,24 +9,17 @@ class ColumnValues extends React.Component {
 
     render() {
         return (
-            <div className="column-members-modal">
+            <div hidden={this.props.hidden === 'true'} className="column-members-modal">
 
                 <div id="columnMembersModalContent" className="column-members-modal-content">
 
                     <button type="button" className="column-members-modal-close-button"
-                            // onClick="closeColumnMembers('cm-modal-${id}')"
+                        // onClick="closeColumnMembers('cm-modal-${id}')"
                     >
                         X
                     </button>
 
                     <br/>
-
-                    {/*<button type="button" id="cm-modal-${id}-add-subQuery" name="cm-modal-${id}-add-subQuery"*/}
-                    {/*        className="column-members-modal-close-button"*/}
-                    {/*        onClick="addSubQueryHTML('cm-modal-${id}-selectedMembers', 'cm-modal-${id}')"*/}
-                    {/*>*/}
-                    {/*    Add SubQuery*/}
-                    {/*</button>*/}
 
                     {/*Search box area*/}
                     <div className="column-members-modal-search">
@@ -35,7 +29,7 @@ class ColumnValues extends React.Component {
 
                     {/*Limit and paging area*/}
                     <div className="column-members-modal-pagination">
-                        <input type="text" hidden="hidden" value="0"/>
+                        <input type="text" hidden="hidden" defaultValue="0"/>
 
                         <label htmlFor="columnMembersLimit">Limit</label>
                         <select>
@@ -56,49 +50,52 @@ class ColumnValues extends React.Component {
                         <br/>
 
                         <button type="button" disabled
-                                // onClick="getPageMembers('cm-modal-${id}', true)"
+                            // onClick="getPageMembers('cm-modal-${id}', true)"
                         >
                             Prior Page
                         </button>
 
                         <button type="button"
-                                // onClick="getPageMembers('cm-modal-${id}', false)"
+                            // onClick="getPageMembers('cm-modal-${id}', false)"
                         >
                             Next Page
                         </button>
                     </div>
 
                     {/*Member selection area*/}
-                    <div className="column-members-modal-members">
+                    <div className='column-members-selection'>
+
                         <div className="column-members-modal-available-members">
                             <label htmlFor="availableMembers">Available Column Members</label>
-                            <select size="20" multiple="multiple">
-                            </select>
+                            <select multiple="" size="20"></select>
                         </div>
+
+                        <div className="column-members-selection-button-div">
+                            <button type="button" className="column-members-selection-button">→</button>
+                        </div>
+
+                        <div className="column-members-modal-selected-members">
+                            <label htmlFor="selectedMembers">Selected Column Members</label>
+                            <select size="20"></select>
+                        </div>
+
                     </div>
 
-                    <button type="button">
-                        &#8594;
-                    </button>
-                </div>
+                    {/*Submission and Cancel button area*/}
+                    <div className="column-members-modal-submit">
+                        <input type="button" value="OK" />
+                        {/*onClick="setCriteriaFilterWithColumnMembers('cm-modal-${id}-selectedMembers', '${parentId}'); closeColumnMembers('cm-modal-${id}');"/>*/}
 
-                <div className="column-members-modal-selected-members">
-                    <label htmlFor="selectedMembers">Selected Column Members</label>
-                    <select size="20">
-                    </select>
-                </div>
-
-                {/*Submission and Cancel button area*/}
-                <div className="column-members-modal-submit">
-                    <input type="button" value="OK"
-                           onClick="setCriteriaFilterWithColumnMembers('cm-modal-${id}-selectedMembers', '${parentId}'); closeColumnMembers('cm-modal-${id}');"/>
-
-                    <button type="button"
+                        <button type="button"
                             // onClick="closeColumnMembers('cm-modal-${id}')"
-                    >
-                        Cancel
-                    </button>
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
                 </div>
+
+            </div>
         );
     }
 

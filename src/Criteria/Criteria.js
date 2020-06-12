@@ -10,6 +10,10 @@ class Criteria extends React.Component {
         super(props);
     }
 
+    onColumnValuesClickHandler = (criterion) => {
+
+    };
+
     render() {
         let criteriaJsx = [];
         this.props.criteria.forEach(criterion => {

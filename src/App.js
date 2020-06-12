@@ -7,6 +7,7 @@ import SchemasAndTables from "./SchemasAndTables/SchemasAndTables";
 import Columns from "./Columns/Columns";
 import OtherOptions from "./OtherOptions/OtherOptions";
 import Criteria from "./Criteria/Criteria";
+import ColumnValues from "./Modals/ColumnValues/ColumnValues";
 
 
 class App extends React.Component {
@@ -53,6 +54,11 @@ class App extends React.Component {
 
                 <Criteria
                     hidden={this.props.menuBar.elementVisibility.criteriaElementHidden.toString()}
+                />
+
+                {/*Modals*/}
+                <ColumnValues
+                    hidden={this.props.modal.hideColumnMembersModal.toString()}
                 />
 
             </div>

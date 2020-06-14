@@ -1,5 +1,7 @@
 import React from "react";
 import './ColumnValues.css';
+import {store} from "../../index";
+import {connect} from "react-redux";
 
 class ColumnValues extends React.Component {
 
@@ -83,8 +85,9 @@ class ColumnValues extends React.Component {
 
                     {/*Submission and Cancel button area*/}
                     <div className="column-members-modal-submit">
-                        <input type="button" value="OK" />
-                        {/*onClick="setCriteriaFilterWithColumnMembers('cm-modal-${id}-selectedMembers', '${parentId}'); closeColumnMembers('cm-modal-${id}');"/>*/}
+                        <input type="button" value="OK"
+                               onClick={this.props.onSubmitColumnValues}
+                        />
 
                         <button type="button"
                             // onClick="closeColumnMembers('cm-modal-${id}')"
@@ -101,4 +104,39 @@ class ColumnValues extends React.Component {
 
 }
 
-export default ColumnValues;
+const mapReduxStateToProps = (reduxState) => {
+    return reduxState.query
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSubmitColumnValues: () => {
+            // Get object ref and attribute to update.
+            let targetObjectRef = store.getState().modal.columnValueModal.target.object;
+            let targetAttribute = store.getState().modal.columnValueModal.target.attribute;
+
+            let newCriteria = [ ...store.getState().query.criteria ];
+
+            newCriteria.forEach(criterion => {
+                if (criterion === targetObjectRef) {
+                    criterion[targetAttribute] = 'hello world';
+                }
+            });
+
+            // Dispatch action to update criteria.
+            dispatch({
+                type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
+                payload: {
+                    newCriteria: newCriteria
+                }
+            });
+
+            // Dispatch action to close Column Values modal.
+            dispatch({
+                type: 'CLOSE_COLUMN_VALUES_MODAL',
+            });
+        }
+    }
+};
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(ColumnValues);

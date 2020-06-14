@@ -79,7 +79,7 @@ class Criterion extends React.Component {
                 />
 
                 <input type="button" id={`columnMembers-${criterion.id}`} value="Column Values" className="criteria-add-remove-buttons"
-                       onClick={this.props.onShowColumnValuesModal}
+                       onClick={() => this.props.onShowColumnValuesModal(criterion, 'filter')}
                 />
             </div>
         );
@@ -90,7 +90,6 @@ class Criterion extends React.Component {
 const mapReduxStateToProps = (reduxState) => {
     return {
         ...reduxState.query,
-        ...reduxState.modal
     }
 };
 
@@ -146,7 +145,16 @@ const mapDispatchToProps = (dispatch) => {
 
             dispatch({ type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } });
         },
-        onShowColumnValuesModal: () => dispatch({ type: 'SHOW_COLUMN_VALUES_MODAL', payload: { hide: false } })
+        onShowColumnValuesModal: (targetObject, targetAttribute) => dispatch({
+            type: 'SHOW_COLUMN_VALUES_MODAL',
+            payload: {
+                hide: false,
+                target: {
+                    object: targetObject,
+                    attribute: targetAttribute
+                }
+            }
+        })
     }
 };
 

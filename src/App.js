@@ -59,6 +59,7 @@ class App extends React.Component {
                 {/*Modals*/}
                 <ColumnValues
                     hidden={this.props.modal.hideColumnMembersModal.toString()}
+                    modalState={this.props.modal.columnValueModal}
                 />
 
             </div>

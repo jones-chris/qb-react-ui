@@ -72,6 +72,20 @@ const queryReducer = (state = initialState, action) => {
                 ...state,
                 criteria: action.payload.newCriteria
             };
+        case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
+            // let newState = { ...state };
+
+            // todo:  move this to action?
+            // let targetCriterion = newState.criteria.forEach(criterion => {
+            //     if (criterion === action.payload.targetObjectRef) {
+            //         targetCriterion[action.payload.targetAttribute] = action.payload.value;
+            //     }
+            // });
+
+            return {
+                ...state,
+                criteria: action.payload.newCriteria
+            };
         default:
             return state;
     }

@@ -24,6 +24,7 @@ const queryReducer = (state = initialState, action) => {
         case 'SELECT_SCHEMA':
             return {
                 ...state,
+                selectedSchemas: action.payload.selectedSchemas,
                 availableTables: action.payload.tables
             };
         case 'SELECT_TABLE':
@@ -73,15 +74,6 @@ const queryReducer = (state = initialState, action) => {
                 criteria: action.payload.newCriteria
             };
         case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
-            // let newState = { ...state };
-
-            // todo:  move this to action?
-            // let targetCriterion = newState.criteria.forEach(criterion => {
-            //     if (criterion === action.payload.targetObjectRef) {
-            //         targetCriterion[action.payload.targetAttribute] = action.payload.value;
-            //     }
-            // });
-
             return {
                 ...state,
                 criteria: action.payload.newCriteria

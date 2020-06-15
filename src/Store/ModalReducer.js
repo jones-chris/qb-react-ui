@@ -20,36 +20,55 @@ const modalReducer = (state = initialState, action) => {
                 id: 0,  // There will only be 1 Column Values modal and state at a time.
                 offset: 0,
                 limit: 2,
-                order: 'asc',
-                search: '',
+                ascending: true,
+                search: null,
+                availableColumnValues: [],
+                selectedColumnValues: [],
                 disablePriorPageButton: true,
                 disableNextPageButton: false,
                 disableLimitDropDown: false,
-                disableOrderDropDown: false
+                disableOrderDropDown: false,
+                uiMessage: '',
+                firstPaginationOccurred: false
             };
 
             newState.hideColumnMembersModal = action.payload.hide;
             newState.columnValueModal = initialColumnValuesModalState;
 
             return newState;
-        case 'GET_AVAILABLE_COLUMN_VALUES':
-            // Get available column members.  //todo:  put this in another action type after initial load.
+        case 'UPDATE_COLUMN_VALUES_LIMIT':
+            newState.columnValueModal.limit = action.payload.newLimit;
+            return newState;
+        case 'UPDATE_COLUMN_VALUES_ASCENDING':
+            newState.columnValueModal.ascending = action.payload.newAscending;
+            return newState;
+        case 'UPDATE_COLUMN_VALUES_SEARCH':
+            newState.columnValueModal.search = action.payload.newSearch;
+            return newState;
+        case 'UPDATE_AVAILABLE_COLUMN_MEMBERS':
+            // If this is the first pagination, set `firstPaginationOccurred` to true, so that Limit, Offset, and Search
+            // can be disabled in the Column Values modal UI.
+            if (! newState.columnValueModal.firstPaginationOccurred) {
+                newState.columnValueModal.firstPaginationOccurred = ! newState.columnValueModal.firstPaginationOccurred;
+            }
 
             // Add available column members to modal state.
+            newState.columnValueModal.availableColumnValues = action.payload.newColumnValues;
 
-            // Update pagination in modal state.
-            return state;
-        case 'ADD_COLUMN_VALUES_DATA':
-            return state;
-        // case 'UPDATE_COLUMN_VALUES_TARGET_ATTRIBUTE':
-        //     // Get target object ref and attribute.
-        //     let targetObjectRef = state.columnValueModal.target.object;
-        //     let targetObjectAttribute = state.columnValueModal.target.attribute;
-        //
-        //     // Update target object ref's attribute.
-        //     targetObjectRef[targetObjectAttribute] = 'hello';
-        //
-        //     return newState;
+            // Update offset.
+            newState.columnValueModal.offset += action.payload.offsetDelta;
+
+            // Update the UI message.
+            newState.columnValueModal.uiMessage = action.payload.uiMessage;
+
+            // Enable/disable Prior Page and Next Page buttons.
+            newState.columnValueModal.disablePriorPageButton = action.payload.disablePriorPageButton;
+            newState.columnValueModal.disableNextPageButton = action.payload.disableNextPageButton;
+
+            return newState;
+        case 'ADD_SELECTED_COLUMN_VALUES':
+            newState.columnValueModal.selectedColumnValues.push(action.payload.columnValuesToAdd);
+            return newState;
         case 'CLOSE_COLUMN_VALUES_MODAL':
             return initialState;
         default:

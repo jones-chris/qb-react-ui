@@ -3,6 +3,7 @@ import './ColumnValues.css';
 import {store} from "../../index";
 import {connect} from "react-redux";
 import * as Utils from "../../Utils/Utils";
+import _ from 'lodash';
 
 class ColumnValues extends React.Component {
 
@@ -14,11 +15,21 @@ class ColumnValues extends React.Component {
         // Create available column values JSX.
         let availableColumnValuesJsx = [];
         if (this.props.columnValueModal !== null) {
-            this.props.columnValueModal.availableColumnValues.forEach(availableColumnValue => {
+            this.props.columnValueModal.availableColumnValues.forEach((availableColumnValue, index) => {
                 availableColumnValuesJsx.push(
-                    <option key={availableColumnValue} value={availableColumnValue}>{availableColumnValue}</option>
+                    <option key={index} value={availableColumnValue}>{availableColumnValue}</option>
                 )
             });
+        }
+
+        // Create selected column values JSX.
+        let selectedColumnValuesJsx = [];
+        if (this.props.columnValueModal !== null) {
+            this.props.columnValueModal.selectedColumnValues.forEach((selectedColumnValue, index) => {
+                selectedColumnValuesJsx.push(
+                    <option key={index} value={selectedColumnValue}>{selectedColumnValue}</option>
+                )
+            })
         }
 
         return (
@@ -92,23 +103,37 @@ class ColumnValues extends React.Component {
                     <div className='column-members-selection'>
 
                         <div className="column-members-modal-available-members">
-                            <label htmlFor="availableMembers">Available Column Members</label>
-                            <select multiple={true} size="20">
+                            <label htmlFor="availableValues">Available Column Members</label>
+                            <select id="availableColumnValues" multiple={true} size="20">
                                 {availableColumnValuesJsx}
                             </select>
                         </div>
 
                         <div className="column-members-selection-button-div">
-                            <button type="button" className="column-members-selection-button"
-                                    onClick={(event) => this.props.onAddSelectColumnValues(event.target)}
-                            >
-                                →
-                            </button>
+                            <div>
+                                <button type="button" className="column-members-selection-button"
+                                        onClick={this.props.onAddSelectColumnValues}
+                                >
+                                    →
+                                </button>
+                            </div>
+
+                            <br/>
+
+                            <div>
+                                <button type="button" className="column-members-selection-button"
+                                        onClick={this.props.onRemoveSelectedColumnValues}
+                                >
+                                    &#8592;
+                                </button>
+                            </div>
                         </div>
 
                         <div className="column-members-modal-selected-members">
                             <label htmlFor="selectedMembers">Selected Column Members</label>
-                            <select size="20"></select>
+                            <select id="selectedColumnValues" multiple={true} size="20">
+                                {selectedColumnValuesJsx}
+                            </select>
                         </div>
 
                     </div>
@@ -148,11 +173,15 @@ const mapDispatchToProps = (dispatch) => {
             let targetObjectRef = store.getState().modal.columnValueModal.target.object;
             let targetAttribute = store.getState().modal.columnValueModal.target.attribute;
 
+            // Copy the query state's criteria.
             let newCriteria = [ ...store.getState().query.criteria ];
 
+            // Get the selected column values that will become the value of the target object ref and target attribute.
+            let selectedColumnValues = store.getState().modal.columnValueModal.selectedColumnValues;
+
             newCriteria.forEach(criterion => {
-                if (criterion === targetObjectRef) {
-                    criterion[targetAttribute] = 'hello world';
+                if (_.isEqual(criterion, targetObjectRef)) {
+                    criterion[targetAttribute] = selectedColumnValues.join(',');
                 }
             });
 
@@ -295,13 +324,31 @@ const mapDispatchToProps = (dispatch) => {
                     });
                 })
         },
-        onAddSelectColumnValues: (target) => {
-            let selectedAvailableColumnValues = Utils.getSelectedOptions(target);
+        onAddSelectColumnValues: () => {
+            let availableColumnValuesElement = document.getElementById('availableColumnValues');
+            let selectedAvailableColumnValues = Utils.getSelectedOptions(availableColumnValuesElement);
+
+            // Remove selected available column values that already exist in the `selectedColumnValues` state so that
+            // duplicates are prevented.
+            selectedAvailableColumnValues = selectedAvailableColumnValues.filter(columnValue => {
+                return ! store.getState().modal.columnValueModal.selectedColumnValues.includes(columnValue);
+            });
 
             dispatch({
                 type: 'ADD_SELECTED_COLUMN_VALUES',
                 payload: {
                     columnValuesToAdd: selectedAvailableColumnValues
+                }
+            })
+        },
+        onRemoveSelectedColumnValues: () => {
+            let selectedColumnValuesElement = document.getElementById('selectedColumnValues');
+            let columnValuesToRemove = Utils.getSelectedOptions(selectedColumnValuesElement);
+
+            dispatch({
+                type: 'REMOVE_SELECTED_COLUMN_VALUES',
+                payload: {
+                    columnValuesToRemove: columnValuesToRemove
                 }
             })
         }

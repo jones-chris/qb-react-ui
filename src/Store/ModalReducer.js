@@ -1,3 +1,5 @@
+import {store} from "../index";
+
 const initialState = {
     hideColumnMembersModal: true,
     columnValueModal: null
@@ -67,7 +69,16 @@ const modalReducer = (state = initialState, action) => {
 
             return newState;
         case 'ADD_SELECTED_COLUMN_VALUES':
-            newState.columnValueModal.selectedColumnValues.push(action.payload.columnValuesToAdd);
+            action.payload.columnValuesToAdd.forEach(columnValue => {
+                newState.columnValueModal.selectedColumnValues.push(columnValue);
+            });
+
+            return newState;
+        case 'REMOVE_SELECTED_COLUMN_VALUES':
+            newState.columnValueModal.selectedColumnValues = newState.columnValueModal.selectedColumnValues.filter(columnValue => {
+                return ! action.payload.columnValuesToRemove.includes(columnValue);
+            });
+
             return newState;
         case 'CLOSE_COLUMN_VALUES_MODAL':
             return initialState;

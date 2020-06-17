@@ -24,6 +24,7 @@ const queryReducer = (state = initialState, action) => {
         case 'SELECT_SCHEMA':
             return {
                 ...state,
+                selectedSchemas: action.payload.selectedSchemas,
                 availableTables: action.payload.tables
             };
         case 'SELECT_TABLE':
@@ -68,6 +69,11 @@ const queryReducer = (state = initialState, action) => {
                 criteria: action.payload.newCriteria
             };
         case 'UPDATE_CRITERIA':
+            return {
+                ...state,
+                criteria: action.payload.newCriteria
+            };
+        case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
             return {
                 ...state,
                 criteria: action.payload.newCriteria

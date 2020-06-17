@@ -114,7 +114,13 @@ const mapDispatchToProps = (dispatch) => {
                 .then(tables => {
                     console.log(tables);
 
-                    dispatch({ type: 'SELECT_SCHEMA', payload: { tables: tables} })
+                    dispatch({
+                        type: 'SELECT_SCHEMA',
+                        payload: {
+                            selectedSchemas: selectedSchemaObjects,
+                            tables: tables
+                        }
+                    })
                 });
         },
         onSelectTableHandler: (target) => {

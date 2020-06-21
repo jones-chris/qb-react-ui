@@ -78,6 +78,13 @@ const queryReducer = (state = initialState, action) => {
                 ...state,
                 criteria: action.payload.newCriteria
             };
+        case 'IMPORT_QUERY_TEMPLATE':
+            let queryTemplate = action.payload.queryTemplate;
+
+            return {
+                ...state,
+                selectedColumns: queryTemplate.columns //todo:  finish this once qb4j lib's data models are corrected to match web app and front end.
+            };
         default:
             return state;
     }

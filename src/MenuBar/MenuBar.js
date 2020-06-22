@@ -117,13 +117,13 @@ class MenuBar extends Component {
 
                         <hr className="divider"/>
 
-                        <li className={this.props.elementVisibility.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleQueryTemplatesVisibility}
-                        >
-                            <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>
-                        </li>
+                        {/*<li className={this.props.elementVisibility.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}*/}
+                        {/*    onClick={this.props.toggleQueryTemplatesVisibility}*/}
+                        {/*>*/}
+                        {/*    <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>*/}
+                        {/*</li>*/}
 
-                        <hr className="divider"/>
+                        {/*<hr className="divider"/>*/}
 
                         <li className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
                             onClick={this.props.toggleSchemasAndTablesVisibility}

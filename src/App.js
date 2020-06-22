@@ -8,6 +8,7 @@ import Columns from "./Columns/Columns";
 import OtherOptions from "./OtherOptions/OtherOptions";
 import Criteria from "./Criteria/Criteria";
 import ColumnValues from "./Modals/ColumnValues/ColumnValues";
+import QueryTemplates from "./QueryTemplates/QueryTemplates";
 
 
 class App extends React.Component {
@@ -54,6 +55,10 @@ class App extends React.Component {
 
                 <Criteria
                     hidden={this.props.menuBar.elementVisibility.criteriaElementHidden.toString()}
+                />
+
+                <QueryTemplates
+                    hidden={this.props.menuBar.elementVisibility.queryTemplatesElementHidden.toString()}
                 />
 
                 {/*Modals*/}

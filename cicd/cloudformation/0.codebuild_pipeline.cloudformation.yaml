@@ -87,16 +87,7 @@ Resources:
               - s3:PutObject*
               - s3:Abort*
             Effect: Allow
-            Resource:
-              - Fn::GetAtt:
-                  - CodeBuildDependencyCacheBucket
-                  - Arn
-              - Fn::Join:
-                  - ''
-                  - - Fn::GetAtt:
-                        - CodeBuildDependencyCacheBucket
-                        - Arn
-                    - "/*"
+            Resource: '*'
           - Action:
               - logs:CreateLogGroup
               - logs:CreateLogStream

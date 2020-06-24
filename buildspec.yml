@@ -1,0 +1,59 @@
+version: 0.2
+
+env:
+  parameter-store:
+#    CODECOV_TOKEN: CODECOV_TOKEN  # CodeBuild will retrieve this from Systems Manager Parameter Store.
+
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      # Get information about this image, the current directory, maven version, docker version, then update apt-get.
+      - lsb_release -a
+      - pwd
+      - apt-get update
+
+  #      - echo $CODECOV_TOKEN
+
+  pre_build:
+    commands:
+      # Install react-scripts, which will be used to build the react app.
+      - npm i react-scripts
+
+  build:
+    commands:
+      # Build the react app.  The `package.json` file shows that `npm build` maps to the `react-scripts build` command,
+      # which is why it was installed in the pre-build phase.
+      - npm build
+
+  post_build:
+    commands:
+#      - echo $DOCKERHUB_TOKEN | docker login --username joneschris --password-stdin  # Use password-stdin so that password does not go to shell's logs.
+#      - docker push joneschris/qb4j-mvc:1
+
+        # Upload code coverage files.
+        #      - curl -s https://codecov.io/bash > codecov.sh
+      #      - bash codecov.sh -t $CODECOV_TOKEN
+
+      # Deploy all CloudFormation templates.
+      - chmod +x ./cdk/cloudformation_deployment.sh
+      - sh ./cdk/cloudformation_deployment.sh
+
+      # Copy the react app build files to the S3 bucket hosting the website.
+      - aws s3 cp ./build s3://querybuilder4j.net --recursive
+
+artifacts:
+  files:
+    - build/**/*
+  name: qb4j-ui
+  discard-paths: yes
+#  secondary-artifacts:
+#    code_coverage:
+#      files:
+#        - target/site/jacoco/**/*  # All files recursively in jacoco directory.
+#      name: code_coverage.zip
+cache:
+  paths:
+    - '/root/.npm/**/*'

@@ -51,6 +51,8 @@ Resources:
                   - logs:*
                   - elasticloadbalancing:*
                   - elasticloadbalancingv2:*
+                  - route53:*
+                  - s3:*
                 Effect: Allow
                 Resource: "*"
             Version: '2012-10-17'

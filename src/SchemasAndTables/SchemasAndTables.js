@@ -11,17 +11,6 @@ class SchemasAndTables extends Component {
         super(props);
     }
 
-    componentDidMount() {
-        // Get available schemas.
-        let apiUrl = `${store.getState().config.baseApiUrl}/metadata/querybuilder4j/schema`;
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(schemas => {
-                console.log(schemas);
-                this.props.getAvailableSchemasHandler(schemas)
-            });
-    }
-
     render() {
         // Create JSX list of all available schemas so that it can be used when rendering.
         const availableSchemas = [];
@@ -63,8 +52,15 @@ class SchemasAndTables extends Component {
             })
         }
 
+        let uiMessage = '';
+        if (store.getState().query.selectedDatabase === null) {
+            uiMessage = 'Please select a database';
+        }
+
         return (
             <div>
+                <p className="warning">{uiMessage}</p>
+
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="schemas">Schemas</label>
                     <select id="schemas" size="30" multiple={false}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
@@ -94,13 +90,6 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getAvailableSchemasHandler: (availableSchemas) => dispatch({
-            type: 'UPDATE_AVAILABLE_SCHEMAS',
-            payload: {
-                availableSchemas: availableSchemas,
-                isLoading: false
-            }
-        }),
         onSelectSchemaHandler: (schemaFullyQualifiedName) => {
             // Get schema object that has been selected.
             let selectedSchemaObjects = store.getState().query.availableSchemas.filter(schema => schemaFullyQualifiedName === schema.fullyQualifiedName);

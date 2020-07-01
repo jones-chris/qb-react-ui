@@ -1,4 +1,6 @@
 const initialState = {
+    availableDatabases: [],
+    selectedDatabase: null,
     availableSchemas: [],
     selectedSchemas: [],
     availableTables: [],
@@ -16,6 +18,16 @@ const initialState = {
 
 const queryReducer = (state = initialState, action) => {
     switch (action.type) {
+        case 'UPDATE_AVAILABLE_DATABASES':
+            return {
+                ...state,
+                availableDatabases: action.payload.availableDatabases
+            };
+        case 'CHANGE_SELECTED_DATABASE':
+            return {
+                ...state,
+                selectedDatabase: action.payload.selectedDatabase
+            };
         case 'UPDATE_AVAILABLE_SCHEMAS':
             return {
                 ...state,

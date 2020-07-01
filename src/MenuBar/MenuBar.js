@@ -3,12 +3,28 @@ import './MenuBar.css';
 import * as Constants from '../Config/Constants';
 import { connect } from 'react-redux'
 import { store } from "../index";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Button from "react-bootstrap/Button";
 
 
 class MenuBar extends Component {
 
     constructor(props) {
         super(props);
+
+        // Get target databases so they can be added to the drop down nav bar.
+        let apiUrl = `${store.getState().config.baseApiUrl}/metadata/database`;
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(databases => {
+                console.log(databases);
+                this.props.updateAvailableDatabases(databases);
+            })
+            .catch(reason => {
+                console.log(reason);
+            });
     }
 
     onRunQueryHandler = () => {
@@ -85,100 +101,84 @@ class MenuBar extends Component {
                 let parentWindow = store.getState().config.parentWindow;
                 let parentWindowUrl = store.getState().config.parentWindowUrl;
                 parentWindow.postMessage(json, parentWindowUrl);
+            })
+            .catch(reason => {
+                console.error(reason);
             });
     };
 
     render() {
+        // Create database NavDropdown.Item JSX.
+        let availableDatabases = [];
+        store.getState().query.availableDatabases.forEach(database => {
+            availableDatabases.push(
+                <NavDropdown.Item key={database.databaseName}
+                                  onClick={() => this.props.onChangeSelectedDatabase(database)}
+                                  // onClick={() => alert('changed!')}
+                >
+                    {database.databaseName} ({database.databaseType})
+                </NavDropdown.Item>
+            );
+        });
+
         return (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">qb4j</a>
+            <Navbar bg="light" expand="lg">
+                <Navbar.Brand href="#">qb4j</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="mr-auto">
+                        <NavDropdown title="Databases" id="basic-nav-dropdown">
+                            {availableDatabases}
+                        </NavDropdown>
 
-                <button className="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul className="navbar-nav mr-auto">
-
-                        <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Databases
-                            </a>
-                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a className="dropdown-item" href="#">Action</a>
-                                <a className="dropdown-item" href="#">Another action</a>
-                                <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </li>
-
-                        <hr className="divider"/>
-
-                        {/*<li className={this.props.elementVisibility.queryTemplatesElementHidden ? "nav-item" : "nav-item active"}*/}
-                        {/*    onClick={this.props.toggleQueryTemplatesVisibility}*/}
-                        {/*>*/}
-                        {/*    <a className="nav-link" href="#">{Constants.QUERY_TEMPLATES} <span className="sr-only">(current)</span></a>*/}
-                        {/*</li>*/}
-
-                        {/*<hr className="divider"/>*/}
-
-                        <li className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleSchemasAndTablesVisibility}
+                        <Nav.Link className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
+                                  onClick={this.props.toggleSchemasAndTablesVisibility}
                         >
-                            <a className="nav-link" href="#">{Constants.SCHEMAS_AND_TABLES} <span className="sr-only">(current)</span></a>
-                        </li>
+                            Schemas & Tables
+                        </Nav.Link>
 
-                        <hr className="divider"/>
-
-                        <li className={this.props.elementVisibility.joinsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleJoinsVisibility}
+                        <Nav.Link className={this.props.elementVisibility.joinsElementHidden ? "nav-item" : "nav-item active"}
+                                  onClick={this.props.toggleJoinsVisibility}
                         >
-                            <a className="nav-link" href="#">{Constants.JOINS} <span className="sr-only">(current)</span></a>
-                        </li>
+                            Joins
+                        </Nav.Link>
 
-                        <hr className="divider"/>
-
-                        <li className={this.props.elementVisibility.columnsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleColumnsVisibility}
+                        <Nav.Link className={this.props.elementVisibility.columnsElementHidden ? "nav-item" : "nav-item active"}
+                                  onClick={this.props.toggleColumnsVisibility}
                         >
-                            <a className="nav-link" href="#">{Constants.COLUMNS} <span className="sr-only">(current)</span></a>
-                        </li>
+                            Columns
+                        </Nav.Link>
 
-                        <hr className="divider"/>
-
-                        <li className={this.props.elementVisibility.criteriaElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleCriteriaVisibility}
+                        <Nav.Link className={this.props.elementVisibility.criteriaElementHidden ? "nav-item" : "nav-item active"}
+                                  onClick={this.props.toggleCriteriaVisibility}
                         >
-                            <a className="nav-link" href="#">{Constants.CRITERIA} <span className="sr-only">(current)</span></a>
-                        </li>
+                            Criteria
+                        </Nav.Link>
 
-                        <hr className="divider"/>
-
-                        <li className={this.props.elementVisibility.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
-                            onClick={this.props.toggleOtherOptionsVisibility}
+                        <Nav.Link className={this.props.elementVisibility.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
+                                  onClick={this.props.toggleOtherOptionsVisibility}
                         >
-                            <a className="nav-link" href="#">{Constants.OTHER_OPTIONS} <span className="sr-only">(current)</span></a>
-                        </li>
+                            Other Options
+                        </Nav.Link>
+                    </Nav>
 
-                    </ul>
-
-                    <button className="btn btn-outline-primary my-2 my-sm-0"
+                    <Button className="btn btn-outline-primary my-2 my-sm-0"
                             onClick={this.onRunQueryHandler}
                     >
                         Run Query
-                    </button>
+                    </Button>
 
-                </div>
-            </nav>
+                </Navbar.Collapse>
+            </Navbar>
         );
     }
 }
 
 const mapReduxStateToProps = (reduxState) => {
-    return reduxState.menuBar;
+    return {
+        ...reduxState.menuBar,
+        ...reduxState.query
+    }
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -188,7 +188,41 @@ const mapDispatchToProps = (dispatch) => {
         toggleQueryTemplatesVisibility: () => dispatch({ type: Constants.QUERY_TEMPLATES }),
         toggleColumnsVisibility: () => dispatch({ type: Constants.COLUMNS }),
         toggleCriteriaVisibility: () => dispatch({ type: Constants.CRITERIA }),
-        toggleOtherOptionsVisibility: () => dispatch({ type: Constants.OTHER_OPTIONS })
+        toggleOtherOptionsVisibility: () => dispatch({ type: Constants.OTHER_OPTIONS }),
+        updateAvailableDatabases: (availableDatabases) => {
+            dispatch({
+                type: 'UPDATE_AVAILABLE_DATABASES',
+                payload: {
+                    availableDatabases: availableDatabases
+                }
+            })
+        },
+        onChangeSelectedDatabase: (selectedDatabase) => {
+            // Update selected database.
+            dispatch({
+                type: 'CHANGE_SELECTED_DATABASE',
+                payload: {
+                    selectedDatabase: selectedDatabase
+                }
+            });
+
+            // Get available schemas for the database.
+            let apiUrl = `${store.getState().config.baseApiUrl}/metadata/${selectedDatabase.databaseName}/schema`;
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(schemas => {
+                    console.log(schemas);
+
+                    // Update the schemas in the redux state.
+                    dispatch({
+                        type: 'UPDATE_AVAILABLE_SCHEMAS',
+                        payload: {
+                            availableSchemas: schemas,
+                            isLoading: false
+                        }
+                    })
+                });
+        }
     }
 };
 

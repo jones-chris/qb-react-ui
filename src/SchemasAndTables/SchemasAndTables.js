@@ -19,7 +19,6 @@ class SchemasAndTables extends Component {
                 <option key={schema.fullyQualifiedName}
                         value={schema.fullyQualifiedName}
                         selected={this.props.selectedSchemas.includes(schema)}
-                        onClick={() => this.props.onSelectSchemaHandler(schema.fullyQualifiedName)}
                 >
                     {schema.schemaName}
                 </option>
@@ -41,12 +40,19 @@ class SchemasAndTables extends Component {
             this.props.availableTables.forEach(table => {
                 let isSelected = selectedTables.includes(table.fullyQualifiedName);
 
+                let optionDisplayText;
+                if (table.schemaName === "null") {
+                    optionDisplayText = table.tableName;
+                } else {
+                    optionDisplayText = `${table.schemaName}.${table.tableName}`
+                }
+
                 availableTables.push(
                     <option key={table.fullyQualifiedName}
                             value={table.fullyQualifiedName}
                             selected={isSelected}
                     >
-                        {table.tableName}
+                        {optionDisplayText}
                     </option>
                 );
             })
@@ -63,8 +69,8 @@ class SchemasAndTables extends Component {
 
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="schemas">Schemas</label>
-                    <select id="schemas" size="30" multiple={false}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
-                            onChange={this.props.selectSchemasHandler}
+                    <select id="schemas" size="30" multiple={true}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
+                            onChange={(event) => this.props.onSelectSchemaHandler(event.target)}
                     >
                         {availableSchemas}
                     </select>
@@ -90,14 +96,17 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onSelectSchemaHandler: (schemaFullyQualifiedName) => {
+        onSelectSchemaHandler: (target) => {
+            let newSelectedSchemasFullyQualifiedNames = Utils.getSelectedOptions(target);
+
             // Get schema object that has been selected.
-            let selectedSchemaObjects = store.getState().query.availableSchemas.filter(schema => schemaFullyQualifiedName === schema.fullyQualifiedName);
+            let selectedSchemaObjects = store.getState().query.availableSchemas.filter(schema => newSelectedSchemasFullyQualifiedNames.includes(schema.fullyQualifiedName));
 
             // Create a string with the schema names joined together with `&` to be used in API call.
             let joinedSchemaString = selectedSchemaObjects.map(schema => schema.schemaName).join('&');
 
-            let apiUrl = `${store.getState().config.baseApiUrl}/metadata/querybuilder4j/${joinedSchemaString}/table-and-view`;
+            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
+            let apiUrl = `${store.getState().config.baseApiUrl}/metadata/${selectedDatabaseName}/${joinedSchemaString}/table-and-view`;
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(tables => {

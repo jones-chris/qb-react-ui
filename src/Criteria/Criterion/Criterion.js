@@ -2,8 +2,9 @@ import React from "react";
 import './Criterion.css';
 import * as Constants from '../../Config/Constants';
 import { connect } from "react-redux";
-import { addCriterion } from "../../actions/CriteriaActions";
+import { addCriterion, updateCriterion, deleteCriterion } from "../../actions/CriteriaActions";
 import { store } from "../../index";
+import _ from 'lodash';
 
 class Criterion extends React.Component {
 
@@ -17,12 +18,19 @@ class Criterion extends React.Component {
         // Create option HTML elements for each available column.
         let availableColumnsJsx = [];
         this.props.availableColumns.forEach(availableColumn => {
+            let optionDisplayText;
+            if (availableColumn.schemaName === "null") {
+                optionDisplayText = `${availableColumn.tableName}.${availableColumn.columnName}`;
+            } else {
+                optionDisplayText = `${availableColumn.schemaName}.${availableColumn.tableName}.${availableColumn.columnName}`
+            }
+
             availableColumnsJsx.push(
                 <option key={availableColumn.fullyQualifiedName}
-                        value={availableColumn.tableName + '.' + availableColumn.columnName}
-                        selected={availableColumn.tableName + '.' + availableColumn.columnName === criterion.column}
+                        value={availableColumn.fullyQualifiedName}
+                        selected={_.isEqual(availableColumn, criterion.column)}
                 >
-                    {availableColumn.tableName + '.' + availableColumn.columnName}
+                    {optionDisplayText}
                 </option>
             )
         });
@@ -33,21 +41,21 @@ class Criterion extends React.Component {
         return (
             <div id={`row.${criterion.id}`} className="criteria-row" style={{paddingLeft: paddingLeftNum}}>
 
-                <select id={`criteria${criterion.id}.conjunction`} name={`criteria[${criterion.id}].conjunction`} className="criteria-conjuction-and-operator"
-                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion.id, Constants.CONJUNCTION, event.target.value)}
+                <select className="criteria-conjuction-and-operator"
+                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.CONJUNCTION, event.target.value)}
                 >
                     <option value="And" selected={criterion.conjunction === 'And'}>And</option>
                     <option value="Or" selected={criterion.conjunction === 'Or'}>Or</option>
                 </select>
 
-                <select id={`criteria${criterion.id}.column`} name={`criteria[${criterion.id}].column`} className="criteria-column-and-filter"
-                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion.id, Constants.COLUMN, event.target.value)}
+                <select className="criteria-column-and-filter"
+                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.COLUMN, event.target.value)}
                 >
                     {availableColumnsJsx}
                 </select>
 
-                <select id={`criteria${criterion.id}.operator`} name={`criteria[${criterion.id}].operator`} className="criteria-conjuction-and-operator"
-                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion.id, Constants.OPERATOR, event.target.value)}
+                <select className="criteria-conjuction-and-operator"
+                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.OPERATOR, event.target.value)}
                 >
                     <option value="equalTo" selected={criterion.operator === 'equalTo'}>=</option>
                     <option value="notEqualTo" selected={criterion.operator === 'notEqualTo'}>&lt;&gt;</option>
@@ -63,22 +71,26 @@ class Criterion extends React.Component {
                     <option value="isNotNull" selected={criterion.operator === 'isNotNull'}>is not null</option>
                 </select>
 
-                <input id={`criteria${criterion.id}.filter`} name={`criteria[${criterion.id}].filter`} className="criteria-column-and-filter"
+                <input className="criteria-column-and-filter"
                        value={criterion.filter}
-                       onChange={(event) => this.props.onUpdateCriterionHandler(criterion.id, Constants.FILTER, event.target.value)}
+                       onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.FILTER, event.target.value)}
                 />
 
-                <input type="button" id={`addCriteria-${criterion.id}`} value="+"
+                <input type="button"
+                       value="+"
                        className="criteria-add-remove-buttons"
-                       onClick={() => this.props.onAddCriterionHandler(criterion.id)}
+                       onClick={() => this.props.onAddCriterionHandler(criterion)}
                 />
 
-                <input type="button" id={`removeCriteria-${criterion.id}`} value="X"
+                <input type="button"
+                       value="X"
                        className="criteria-add-remove-buttons"
-                       onClick={() => this.props.onDeleteCriterionHandler(criterion.id)}
+                       onClick={() => this.props.onDeleteCriterionHandler(criterion)}
                 />
 
-                <input type="button" id={`columnMembers-${criterion.id}`} value="Column Values" className="criteria-add-remove-buttons"
+                <input type="button"
+                       value="Column Values"
+                       className="criteria-add-remove-buttons"
                        onClick={() => this.props.onShowColumnValuesModal(criterion, 'filter')}
                 />
             </div>
@@ -95,55 +107,14 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onAddCriterionHandler: (parentId) => {
-            dispatch(addCriterion(parentId));
+        onAddCriterionHandler: (parentCriterion) => {
+            dispatch(addCriterion(parentCriterion));
         },
-        onUpdateCriterionHandler: (criterionId, criterionObjectAttributeName, value) => {
-            let newCriteria = [...store.getState().query.criteria];
-
-            newCriteria.forEach(criterion => {
-                if (criterion.id === criterionId) {
-                    criterion[criterionObjectAttributeName] = value;
-                }
-            });
-
-            dispatch({ type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } })
+        onUpdateCriterionHandler: (criterion, criterionObjectAttributeName, value) => {
+            dispatch(updateCriterion(criterion, criterionObjectAttributeName, value));
         },
         onDeleteCriterionHandler: (criterionId) => {
-            // Copy store state.
-            let newCriteria = [...store.getState().query.criteria];
-
-            // Remove the criterion with the matching id.
-            newCriteria = newCriteria.filter(criterion => criterion.id !== criterionId);
-            newCriteria.forEach((criterion, newIndex) => {  // Renumber the criterions' id and parentId.
-                // Only change the criterion if it's after the deleted criterion.
-                if (criterion.id > criterionId) {
-                    criterion.id = newIndex;
-
-                    // If criterion is new first root criteria, then set parent id and level.
-                    if (criterion.id === 0) {
-                        criterion.parentId = null;
-                        criterion.metadata.level = 0;
-                    }
-
-                    // If the criterion's parent id is equal or greater than the criterion that was deleted, then reduce parentId
-                    // by 1.
-                    if (criterion.parentId !== null && criterion.parentId >= criterionId) {
-                        if (criterion.parentId === 0) {
-                            criterion.parentId = null;
-                            criterion.metadata.level = 0;
-                        } else {
-                            criterion.parentId = parseInt(criterion.parentId) - 1;
-
-                            // Get the new criterion's level.  This will be the parent criterion's level plus 1.
-                            let parentCriterion = newCriteria.find(crit => crit.id === criterion.parentId);
-                            criterion.metadata.level = parentCriterion.metadata.level + 1;
-                        }
-                    }
-                }
-            });
-
-            dispatch({ type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } });
+            dispatch(deleteCriterion(criterionId));
         },
         onShowColumnValuesModal: (targetObject, targetAttribute) => dispatch({
             type: 'SHOW_COLUMN_VALUES_MODAL',

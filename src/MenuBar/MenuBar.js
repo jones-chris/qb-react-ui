@@ -31,16 +31,6 @@ class MenuBar extends Component {
         const currentQueryState = store.getState().query;
         const currentJoinState = store.getState().joins;
 
-        // Put selected columns in the format the API is expecting.
-        // todo:  change this once the qb4j library, backend, and front end all use the same schema.
-        let selectedColumns = [];
-        for (let column of currentQueryState.selectedColumns) {
-            selectedColumns.push({
-                fullyQualifiedName: column.tableName + '.' + column.columnName,
-                alias: ''
-            });
-        }
-
         // Determine parent table.
         let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
         let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
@@ -70,8 +60,9 @@ class MenuBar extends Component {
         // Build statement object
         let statement = {
             name: '',
-            columns: selectedColumns,
-            table: parentTable.tableName, // todo:  pass entire parentTable object to API when object structures are standardized across library, backend, and frontend.
+            database: currentQueryState.selectedDatabase,
+            columns: currentQueryState.selectedColumns,
+            table: parentTable,
             criteria: currentQueryState.criteria,
             joins: preparedJoins,
             distinct: currentQueryState.distinct,

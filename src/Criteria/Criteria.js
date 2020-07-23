@@ -10,22 +10,38 @@ class Criteria extends React.Component {
         super(props);
     }
 
-    onColumnValuesClickHandler = (criterion) => {
-
-    };
-
-    render() {
-        let criteriaJsx = [];
-        this.props.criteria.forEach(criterion => {
-            criteriaJsx.push(
+    recursivelyBuildCriteriaJsx = (criteria, criteriaJsxHolder = []) => {
+        criteria.forEach(criterion => {
+            criteriaJsxHolder.push(
                 <Criterion
                     key={criterion.id}
                     criterion={criterion}
                     availableColumns={this.props.availableColumns}
                 >
                 </Criterion>
-            )
+            );
+
+            this.recursivelyBuildCriteriaJsx(criterion.childCriteria, criteriaJsxHolder);
         });
+
+        return criteriaJsxHolder;
+    };
+
+    render() {
+        let criteriaJsx = [];
+        // this.props.criteria.forEach(criterion => {
+        //     criteriaJsx.push(
+        //         <Criterion
+        //             key={criterion.id}
+        //             criterion={criterion}
+        //             availableColumns={this.props.availableColumns}
+        //         >
+        //         </Criterion>
+        //     )
+        //
+        //
+        // });
+        this.recursivelyBuildCriteriaJsx(this.props.criteria, criteriaJsx);
 
         return (
             <div id="criteria" className="criteria-div" hidden={this.props.hidden === 'true'}>

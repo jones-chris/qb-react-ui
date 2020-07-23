@@ -15,10 +15,17 @@ class Columns extends React.Component {
         const availableColumns = [];
         if (this.props.availableColumns) {
             this.props.availableColumns.forEach(column => {
+                let optionDisplayText;
+                if (column.schemaName === "null") {
+                    optionDisplayText = `${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`;
+                } else {
+                    optionDisplayText = `${column.schemaName}.${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`;
+                }
+
                 availableColumns.push(
                     <option key={column.fullyQualifiedName}
                             value={column.fullyQualifiedName}>
-                        {`${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`}
+                        {optionDisplayText}
                     </option>
                 );
             })
@@ -28,10 +35,17 @@ class Columns extends React.Component {
         const selectedColumns = [];
         if (this.props.selectedColumns) {
             this.props.selectedColumns.forEach(column => {
+                let optionDisplayText;
+                if (column.schemaName === "null") {
+                    optionDisplayText = `${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`;
+                } else {
+                    optionDisplayText = `${column.schemaName}.${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`;
+                }
+
                 selectedColumns.push(
                     <option key={column.fullyQualifiedName}
                             value={column.fullyQualifiedName}>
-                        {`${column.tableName}.${column.columnName} (${Utils.getJdbcSqlType(column.dataType)})`}
+                        {optionDisplayText}
                     </option>
                 );
             })

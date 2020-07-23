@@ -7,6 +7,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
+import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 
 
 class MenuBar extends Component {
@@ -30,16 +31,6 @@ class MenuBar extends Component {
     onRunQueryHandler = () => {
         const currentQueryState = store.getState().query;
         const currentJoinState = store.getState().joins;
-
-        // Put selected columns in the format the API is expecting.
-        // todo:  change this once the qb4j library, backend, and front end all use the same schema.
-        let selectedColumns = [];
-        for (let column of currentQueryState.selectedColumns) {
-            selectedColumns.push({
-                fullyQualifiedName: column.tableName + '.' + column.columnName,
-                alias: ''
-            });
-        }
 
         // Determine parent table.
         let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
@@ -70,9 +61,10 @@ class MenuBar extends Component {
         // Build statement object
         let statement = {
             name: '',
-            columns: selectedColumns,
-            table: parentTable.tableName, // todo:  pass entire parentTable object to API when object structures are standardized across library, backend, and frontend.
-            criteria: currentQueryState.criteria,
+            database: currentQueryState.selectedDatabase,
+            columns: currentQueryState.selectedColumns,
+            table: parentTable,
+            criteria: replaceParentCriterionIds(currentQueryState.criteria),
             joins: preparedJoins,
             distinct: currentQueryState.distinct,
             groupBy: false,
@@ -84,6 +76,8 @@ class MenuBar extends Component {
         };
 
         console.log(statement);
+
+        console.log(JSON.stringify(statement));
 
         // Send query to API.
         let apiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/query`;

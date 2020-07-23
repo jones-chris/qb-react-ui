@@ -7,6 +7,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
+import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 
 
 class MenuBar extends Component {
@@ -63,7 +64,7 @@ class MenuBar extends Component {
             database: currentQueryState.selectedDatabase,
             columns: currentQueryState.selectedColumns,
             table: parentTable,
-            criteria: currentQueryState.criteria,
+            criteria: replaceParentCriterionIds(currentQueryState.criteria),
             joins: preparedJoins,
             distinct: currentQueryState.distinct,
             groupBy: false,
@@ -75,6 +76,8 @@ class MenuBar extends Component {
         };
 
         console.log(statement);
+
+        console.log(JSON.stringify(statement));
 
         // Send query to API.
         let apiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/query`;

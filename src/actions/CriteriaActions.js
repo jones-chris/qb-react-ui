@@ -1,5 +1,4 @@
-import { store } from "../index";
-import _ from "lodash";
+import {store} from "../index";
 
 export const addCriterion = (parentCriterion) => {
     // Copy the state's criteria to a new array.
@@ -122,6 +121,13 @@ const recursivelySearchAndDeleteCriterion = (criteria, criterionToDelete) => {
     return criteria;
 };
 
+/**
+ * Sets each criterion's metadata (ex:  level, id, etc).
+ *
+ * @param criteria The array of criterion to set metadata for.
+ * @param nextId The next integer id to be passed up and down the tree.
+ * @returns The next id to be used in the next criterion in the tree (above this node).
+ */
 const setCriterionMetadata = (criteria, nextId = 0) => {
     criteria.forEach(criterion => {
         // Set id.
@@ -149,11 +155,43 @@ const setCriterionMetadata = (criteria, nextId = 0) => {
  * @param flattenedCriteriaHolder The array that holds the flattened criteria.
  * @returns An flattened array of criterion.
  */
-const flattenCriteria = (criteria, flattenedCriteriaHolder) => {
+export const flattenCriteria = (criteria, flattenedCriteriaHolder) => {
     criteria.forEach(criterion => {
         flattenedCriteriaHolder.push(criterion);
         flattenCriteria(criterion.childCriteria, flattenedCriteriaHolder);
     });
 
     return flattenedCriteriaHolder;
+};
+
+/**
+ * Removes ciruclar JSON references (the parentCriterion attribute) of each criterion so that each object can be
+ * serialized to JSON to be sent to the API.
+ *
+ * @param criteria The array of criterion.
+ * @returns A flattened array of the criterion with the circular JSON references replaced and attributes that the API
+ * does not need removed.
+ */
+export const replaceParentCriterionIds = (criteria) => {
+    let flattenedCriteria = flattenCriteria(criteria, []);
+
+    return flattenedCriteria.map(criterion => {
+        let criterionClone = Object.assign({}, criterion);
+
+        if (criterionClone.parentCriterion !== null) {
+            criterionClone.parentId = criterionClone.parentCriterion.metadata.id;
+        } else {
+            criterionClone.parentId = null;
+        }
+
+        criterionClone.id = criterionClone.metadata.id;
+
+        delete criterionClone.parentCriterion;
+
+        delete criterionClone.metadata;
+
+        delete criterionClone.childCriteria;
+
+        return criterionClone;
+    });
 };

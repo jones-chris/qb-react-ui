@@ -59,7 +59,7 @@ class MenuBar extends Component {
         console.log(JSON.stringify(statement));
 
         // Send query to API.
-        let apiUrl = `${store.getState().config.baseApiUrl}/data/${currentQueryState.selectedDatabase}/query`;
+        let apiUrl = `${store.getState().config.baseApiUrl}/data/${currentQueryState.selectedDatabase.databaseName}/query`;
         fetch(apiUrl, {
             method: 'POST',
             body: JSON.stringify(statement),

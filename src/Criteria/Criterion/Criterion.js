@@ -49,7 +49,7 @@ class Criterion extends React.Component {
                 </select>
 
                 <select className="criteria-column-and-filter"
-                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.COLUMN, event.target.value)}
+                        onChange={(event) => this.props.onUpdateCriterionColumnHandler(criterion, Constants.COLUMN, event.target.value)}
                 >
                     {availableColumnsJsx}
                 </select>
@@ -109,6 +109,12 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onAddCriterionHandler: (parentCriterion) => {
             dispatch(addCriterion(parentCriterion));
+        },
+        onUpdateCriterionColumnHandler: (criterion, criterionObjectAttributeName, value) => {
+            // Get the column object.
+            let columnObject = store.getState().query.availableColumns.find(column => column.fullyQualifiedName === value);
+
+            dispatch(updateCriterion(criterion, criterionObjectAttributeName, columnObject));
         },
         onUpdateCriterionHandler: (criterion, criterionObjectAttributeName, value) => {
             dispatch(updateCriterion(criterion, criterionObjectAttributeName, value));

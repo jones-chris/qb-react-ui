@@ -13,25 +13,19 @@ const joinReducer = (state = initialState, action) => {
 
     switch (action.type) {
         case 'ADD_JOIN':
-            // Get the default table object if availableTables is not empty.
-            let defaultTableObject = '';
-            if (action.payload.availableTables.length > 0) {
-                defaultTableObject = action.payload.availableTables[0];
-            }
-
             // Create a new join object and add it to the state's `joins` item.
             newJoins.push({
                 joinType: Constants.JOIN_IMAGES[0].name,
-                parentTable: defaultTableObject,
-                targetTable: defaultTableObject,
-                parentJoinColumns: [],
-                targetJoinColumns: [],
+                parentTable: action.payload.parentTable,
+                targetTable: action.payload.targetTable,
+                parentJoinColumns: action.payload.parentJoinColumns,
+                targetJoinColumns: action.payload.targetJoinColumns,
                 metadata: {
                     id: state.joins.length,
                     joinImageUrl: Constants.JOIN_IMAGES[0].image,
                     availableColumns: {
-                        parentColumns: [],
-                        targetColumns: []
+                        parentColumns: action.payload.availableParentColumns,
+                        targetColumns: action.payload.availableTargetColumns
                     }
                 }
             });

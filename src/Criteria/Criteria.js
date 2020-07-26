@@ -29,18 +29,7 @@ class Criteria extends React.Component {
 
     render() {
         let criteriaJsx = [];
-        // this.props.criteria.forEach(criterion => {
-        //     criteriaJsx.push(
-        //         <Criterion
-        //             key={criterion.id}
-        //             criterion={criterion}
-        //             availableColumns={this.props.availableColumns}
-        //         >
-        //         </Criterion>
-        //     )
-        //
-        //
-        // });
+
         this.recursivelyBuildCriteriaJsx(this.props.criteria, criteriaJsx);
 
         return (

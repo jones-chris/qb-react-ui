@@ -2,6 +2,15 @@ import React, { Component } from 'react';
 import './Joins.css'
 import {connect} from "react-redux";
 import { store } from '../index';
+import {
+    addJoin,
+    deleteJoin,
+    changeJoinType,
+    changeTable,
+    addJoinColumn,
+    changeColumn,
+    deleteJoinColumn
+} from "../actions/JoinActions";
 
 
 class Joins extends Component {
@@ -163,56 +172,25 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addJoin: () => dispatch({
-            type: 'ADD_JOIN',
-            payload: {
-                availableTables: store.getState().query.availableTables
-            }
-        }),
-        deleteJoin: (joinId) => dispatch({
-            type: 'DELETE_JOIN',
-            payload: {
-                joinId: joinId
-            }
-        }),
-        changeJoinType: (joinId) => dispatch({
-            type: 'CHANGE_JOIN_TYPE',
-            payload: {
-                joinId: joinId
-            }
-        }),
-        changeTable: (joinId, parentTableElementName, targetTableElementName) => dispatch({
-            type: 'CHANGE_TABLE',
-            payload: {
-                joinId: joinId,
-                parentTableElementName: parentTableElementName,
-                targetTableElementName: targetTableElementName,
-                availableTables: store.getState().query.selectedTables,
-                availableColumns: store.getState().query.availableColumns
-            }
-        }),
-        changeColumn: (joinId, parentJoinColumnsElementId, targetJoinColumnsElementId) => dispatch({
-            type: 'CHANGE_COLUMN',
-            payload: {
-                joinId: joinId,
-                parentJoinColumnsElementId: parentJoinColumnsElementId,
-                targetJoinColumnsElementId: targetJoinColumnsElementId,
-                availableColumns: store.getState().query.availableColumns
-            }
-        }),
-        addJoinColumn: (joinId) => dispatch({
-            type: 'ADD_JOIN_COLUMN',
-            payload: {
-                joinId: joinId
-            }
-        }),
-        deleteJoinColumn: (joinId, joinColumnIndex) => dispatch({
-            type: 'DELETE_JOIN_COLUMN',
-            payload: {
-                joinId: joinId,
-                joinColumnIndex: joinColumnIndex
-            }
-        })
+        addJoin: () => dispatch(addJoin()),
+        deleteJoin: (joinId) => dispatch(deleteJoin(joinId)),
+        changeJoinType: (joinId) => dispatch(changeJoinType(joinId)),
+        changeTable: (joinId, parentTableElementName, targetTableElementName) => {
+            dispatch(
+                changeTable(joinId, parentTableElementName, targetTableElementName)
+            );
+        },
+        changeColumn: (joinId, parentJoinColumnsElementId, targetJoinColumnsElementId) => {
+            dispatch(
+                changeColumn(joinId, parentJoinColumnsElementId, targetJoinColumnsElementId)
+            );
+        },
+        addJoinColumn: (joinId) => dispatch(addJoinColumn(joinId)),
+        deleteJoinColumn: (joinId, joinColumnIndex) => {
+            dispatch(
+                deleteJoinColumn(joinId, joinColumnIndex)
+            )
+        }
     }
 };
 

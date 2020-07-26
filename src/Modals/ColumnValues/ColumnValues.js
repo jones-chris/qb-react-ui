@@ -233,8 +233,8 @@ const mapDispatchToProps = (dispatch) => {
 
             let columnValueModalState = store.getState().modal.columnValueModal;
             let column = columnValueModalState.target.object.column;
-            let tableName = column.split('.')[0];
-            let columnName = column.split('.')[1];
+            let tableName = column.tableName;
+            let columnName = column.columnName;
 
             let baseApiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${columnValueModalState.offset}&ascending=${columnValueModalState.ascending}`;
@@ -282,8 +282,8 @@ const mapDispatchToProps = (dispatch) => {
 
             let columnValueModalState = store.getState().modal.columnValueModal;
             let column = columnValueModalState.target.object.column;
-            let tableName = column.split('.')[0];
-            let columnName = column.split('.')[1];
+            let tableName = column.tableName;
+            let columnName = column.columnName;
 
             let newOffset = columnValueModalState.offset - columnValueModalState.limit;
 

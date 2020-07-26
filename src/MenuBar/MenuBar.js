@@ -8,6 +8,7 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { replaceParentCriterionIds } from "../actions/CriteriaActions";
+import { removeJoinMetadata } from "../actions/JoinActions";
 
 
 class MenuBar extends Component {
@@ -36,28 +37,6 @@ class MenuBar extends Component {
         let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
         let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
 
-        // todo:  Prepare join objects for now but pass object without metadata later when object structures are standardized across library, backend, and front end.
-        let preparedJoins = [];
-        currentJoinState.joins.forEach(join => {
-            let preparedJoin = {
-                joinType: join.joinType,
-                parentTable: (join.parentTable.schemaName === 'null') ? join.parentTable.tableName : join.parentTable.schemaName + '.' + join.parentTable.tableName,
-                targetTable: (join.targetTable.schemaName === 'null') ? join.targetTable.tableName : join.targetTable.schemaName + '.' + join.targetTable.tableName,
-                parentJoinColumns: [],
-                targetJoinColumns: []
-            };
-
-            join.parentJoinColumns.forEach(parentJoinColumn => {
-                preparedJoin.parentJoinColumns.push(parentJoinColumn.tableName + '.' + parentJoinColumn.columnName);
-            });
-
-            join.targetJoinColumns.forEach(targetJoinColumn => {
-                preparedJoin.targetJoinColumns.push(targetJoinColumn.tableName + '.' + targetJoinColumn.columnName);
-            });
-
-            preparedJoins.push(preparedJoin);
-        });
-
         // Build statement object
         let statement = {
             name: '',
@@ -65,7 +44,7 @@ class MenuBar extends Component {
             columns: currentQueryState.selectedColumns,
             table: parentTable,
             criteria: replaceParentCriterionIds(currentQueryState.criteria),
-            joins: preparedJoins,
+            joins: removeJoinMetadata(currentJoinState.joins),
             distinct: currentQueryState.distinct,
             groupBy: false,
             orderBy: false,
@@ -80,7 +59,7 @@ class MenuBar extends Component {
         console.log(JSON.stringify(statement));
 
         // Send query to API.
-        let apiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/query`;
+        let apiUrl = `${store.getState().config.baseApiUrl}/data/${currentQueryState.selectedDatabase.databaseName}/query`;
         fetch(apiUrl, {
             method: 'POST',
             body: JSON.stringify(statement),

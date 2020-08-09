@@ -11,6 +11,7 @@ import {
     changeColumn,
     deleteJoinColumn
 } from "../actions/JoinActions";
+import {assertAllValidations} from "../Validators/Validators";
 
 
 class Joins extends Component {
@@ -172,8 +173,26 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addJoin: () => dispatch(addJoin()),
-        deleteJoin: (joinId) => dispatch(deleteJoin(joinId)),
+        addJoin: () => {
+            dispatch(addJoin());
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+        },
+        deleteJoin: (joinId) => {
+            dispatch(deleteJoin(joinId));
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+        },
         changeJoinType: (joinId) => dispatch(changeJoinType(joinId)),
         changeTable: (joinId, parentTableElementName, targetTableElementName) => {
             dispatch(
@@ -189,7 +208,7 @@ const mapDispatchToProps = (dispatch) => {
         deleteJoinColumn: (joinId, joinColumnIndex) => {
             dispatch(
                 deleteJoinColumn(joinId, joinColumnIndex)
-            )
+            );
         }
     }
 };

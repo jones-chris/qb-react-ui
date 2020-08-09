@@ -3,6 +3,7 @@ import './Columns.css';
 import * as Utils from '../Utils/Utils';
 import { connect } from "react-redux";
 import { store } from '../index';
+import {assertAllValidations} from "../Validators/Validators";
 
 class Columns extends React.Component {
 
@@ -103,7 +104,19 @@ const mapDispatchToProps = (dispatch) => {
                 return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
             });
 
-            dispatch({ type: 'ADD_SELECTED_COLUMN', payload: { selectedColumns: newSelectedColumns } });
+            dispatch({
+                type: 'ADD_SELECTED_COLUMN',
+                payload: {
+                    selectedColumns: newSelectedColumns
+                }
+            });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
         },
         onRemoveSelectedColumnHandler: () => {
             let selectedColumnsSelectElement = document.getElementById('columns');
@@ -113,7 +126,19 @@ const mapDispatchToProps = (dispatch) => {
                 return ! fullyQualifiedColumnsNamesToRemove.includes(column.fullyQualifiedName);
             });
 
-            dispatch({ type: 'REMOVE_SELECTED_COLUMN', payload: { selectedColumns: newSelectedColumns } });
+            dispatch({
+                type: 'REMOVE_SELECTED_COLUMN',
+                payload: {
+                    selectedColumns: newSelectedColumns
+                }
+            });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            })
         }
     }
 };

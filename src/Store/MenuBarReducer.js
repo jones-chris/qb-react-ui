@@ -1,51 +1,110 @@
 import * as Constants from '../Config/Constants';
 
 const initialState = {
-    elementVisibility: {
-        queryTemplatesElementHidden: true,
-        schemasAndTablesElementHidden: false,
-        joinsElementHidden: true,
-        columnsElementHidden: true,
-        criteriaElementHidden: true,
-        otherOptionsElementHidden: true
+    queryTemplates: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: true,
+        hasUnsavedChanges: false
+    },
+    schemasAndTables: {
+        isHidden: false,
+        uiMessages: [],  // Default message when app loads and database has not been chosen.
+        isValid: true,
+        hasUnsavedChanges: false
+    },
+    joins: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: true,  // If the number of joins is 1 less than the number of tables chosen, then false.
+        hasUnsavedChanges: false
+    },
+    columns: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: false, // False until columns are selected.
+        hasUnsavedChanges: false
+    },
+    criteria: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: true,
+        hasUnsavedChanges: false
+    },
+    otherOptions: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: true,
+        hasUnsavedChanges: false
     }
 };
 
-const showAllElements = (state) => {
-    for (let key in state.elementVisibility) {
-        state.elementVisibility[key] = true;
+const hideAllElements = (state) => {
+    for (let key in state) {
+        state[key].isHidden = true;
+    }
+};
+
+const clearSectionUiMessages = (state) => {
+    for (let section in state) {
+        state[section].uiMessages = [];
+    }
+};
+
+const resetSectionValidity = (state) => {
+    for (let section in state) {
+        state[section].isValid = true;
+    }
+};
+
+const updateSectionUiMessages = (state, uiMessage) => {
+    clearSectionUiMessages(state);
+    resetSectionValidity(state);
+
+    if (uiMessage !== null) {
+        let section = uiMessage.section;
+
+        // Add section UI message.
+        state[section].uiMessages.push(
+            uiMessage.message
+        );
+
+        // Set section validity to false because it has a UI message.
+        state[section].isValid = false;
     }
 };
 
 const menuBarReducer = (state = initialState, action) => {
     // Copy state and show all elements (set all keys' value to true).
-    // let newState = Object.assign({}, state);
     let newState = JSON.parse(JSON.stringify(state));
 
     switch (action.type) {
         case Constants.JOINS:
-            showAllElements(newState);
-            newState.elementVisibility.joinsElementHidden = false;
+            hideAllElements(newState);
+            newState.joins.isHidden = false;
             return newState;
         case Constants.SCHEMAS_AND_TABLES:
-            showAllElements(newState);
-            newState.elementVisibility.schemasAndTablesElementHidden = false;
+            hideAllElements(newState);
+            newState.schemasAndTables.isHidden = false;
             return newState;
         case Constants.COLUMNS:
-            showAllElements(newState);
-            newState.elementVisibility.columnsElementHidden = false;
+            hideAllElements(newState);
+            newState.columns.isHidden = false;
             return newState;
         case Constants.CRITERIA:
-            showAllElements(newState);
-            newState.elementVisibility.criteriaElementHidden = false;
+            hideAllElements(newState);
+            newState.criteria.isHidden = false;
             return newState;
         case Constants.OTHER_OPTIONS:
-            showAllElements(newState);
-            newState.elementVisibility.otherOptionsElementHidden = false;
+            hideAllElements(newState);
+            newState.otherOptions.isHidden = false;
             return newState;
         case Constants.QUERY_TEMPLATES:
-            showAllElements(newState);
-            newState.elementVisibility.queryTemplatesElementHidden = false;
+            hideAllElements(newState);
+            newState.queryTemplates.isHidden = false;
+            return newState;
+        case 'UPDATE_UI_MESSAGES':
+            updateSectionUiMessages(newState, action.payload.uiMessages);
             return newState;
         default:
             return state;

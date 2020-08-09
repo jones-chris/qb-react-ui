@@ -4,6 +4,7 @@ import {store} from "../../index";
 import {connect} from "react-redux";
 import * as Utils from "../../Utils/Utils";
 import _ from 'lodash';
+import {assertAllValidations} from "../../Validators/Validators";
 
 class ColumnValues extends React.Component {
 
@@ -196,6 +197,13 @@ const mapDispatchToProps = (dispatch) => {
             // Dispatch action to close Column Values modal.
             dispatch({
                 type: 'CLOSE_COLUMN_VALUES_MODAL',
+            });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
             });
         },
         onCloseColumnValues: () => {

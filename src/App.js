@@ -9,6 +9,8 @@ import OtherOptions from "./OtherOptions/OtherOptions";
 import Criteria from "./Criteria/Criteria";
 import ColumnValues from "./Modals/ColumnValues/ColumnValues";
 import QueryTemplates from "./QueryTemplates/QueryTemplates";
+import Warnings from "./Warnings/Warnings";
+import {assertAllValidations} from "./Validators/Validators";
 
 
 class App extends React.Component {
@@ -34,31 +36,33 @@ class App extends React.Component {
             <div className="App">
                 <MenuBar/>
 
+                <Warnings/>
+
                 {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
                 <Joins
-                    hidden={this.props.menuBar.elementVisibility.joinsElementHidden.toString()}
+                    hidden={this.props.menuBar.joins.isHidden.toString()}
                 />
 
                 {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
                 <SchemasAndTables
-                    hidden={this.props.menuBar.elementVisibility.schemasAndTablesElementHidden.toString()}
+                    hidden={this.props.menuBar.schemasAndTables.isHidden.toString()}
                 />
 
                 {/*Are the non-hidden attributes needed now that the state is available in the component?*/}
                 <Columns
-                    hidden={this.props.menuBar.elementVisibility.columnsElementHidden.toString()}
+                    hidden={this.props.menuBar.columns.isHidden.toString()}
                 />
 
                 <OtherOptions
-                    hidden={this.props.menuBar.elementVisibility.otherOptionsElementHidden.toString()}
+                    hidden={this.props.menuBar.otherOptions.isHidden.toString()}
                 />
 
                 <Criteria
-                    hidden={this.props.menuBar.elementVisibility.criteriaElementHidden.toString()}
+                    hidden={this.props.menuBar.criteria.isHidden.toString()}
                 />
 
                 <QueryTemplates
-                    hidden={this.props.menuBar.elementVisibility.queryTemplatesElementHidden.toString()}
+                    hidden={this.props.menuBar.queryTemplates.isHidden.toString()}
                 />
 
                 {/*Modals*/}
@@ -96,6 +100,13 @@ const mapDispatchToProps = (dispatch) => {
                     uiMessage: uiMessage
                 }
             });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            })
         }
     }
 };

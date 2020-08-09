@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { addCriterion, updateCriterion, deleteCriterion } from "../../actions/CriteriaActions";
 import { store } from "../../index";
 import _ from 'lodash';
+import {assertAllValidations} from "../../Validators/Validators";
 
 class Criterion extends React.Component {
 
@@ -115,9 +116,23 @@ const mapDispatchToProps = (dispatch) => {
             let columnObject = store.getState().query.availableColumns.find(column => column.fullyQualifiedName === value);
 
             dispatch(updateCriterion(criterion, criterionObjectAttributeName, columnObject));
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
         },
         onUpdateCriterionHandler: (criterion, criterionObjectAttributeName, value) => {
             dispatch(updateCriterion(criterion, criterionObjectAttributeName, value));
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
         },
         onDeleteCriterionHandler: (criterionId) => {
             dispatch(deleteCriterion(criterionId));

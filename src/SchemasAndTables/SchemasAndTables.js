@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './SchemasAndTables.css';
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import { store } from '../index';
 import * as Utils from "../Utils/Utils";
+import { assertAllValidations } from "../Validators/Validators";
 
 
 class SchemasAndTables extends Component {
@@ -58,18 +59,12 @@ class SchemasAndTables extends Component {
             })
         }
 
-        let uiMessage = '';
-        if (store.getState().query.selectedDatabase === null) {
-            uiMessage = 'Please select a database';
-        }
-
         return (
             <div>
-                <p className="warning">{uiMessage}</p>
-
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="schemas">Schemas</label>
-                    <select id="schemas" size="30" multiple={true}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
+
+                    <select id="schemas" size="20" multiple={true}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
                             onChange={(event) => this.props.onSelectSchemaHandler(event.target)}
                     >
                         {availableSchemas}
@@ -78,7 +73,7 @@ class SchemasAndTables extends Component {
 
                 <div id="tablesDiv" className="tables-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="table">Tables</label>
-                    <select id="table" name="table" multiple={true} size="30"
+                    <select id="table" name="table" multiple={true} size="20"
                             onChange={(event) => this.props.onSelectTableHandler(event.target)}
                     >
                         {availableTables}
@@ -118,6 +113,13 @@ const mapDispatchToProps = (dispatch) => {
                             selectedSchemas: selectedSchemaObjects,
                             tables: tables
                         }
+                    });
+
+                    dispatch({
+                        type: 'UPDATE_UI_MESSAGES',
+                        payload: {
+                            uiMessages: assertAllValidations()
+                        }
                     })
                 });
         },
@@ -139,7 +141,21 @@ const mapDispatchToProps = (dispatch) => {
                 .then(columns => {
                     console.log(columns);
 
-                    dispatch( { type: 'SELECT_TABLE', payload: { selectedTables: allTables, availableColumns: columns } } )
+                    dispatch({
+                        type: 'SELECT_TABLE',
+                        payload: {
+                            selectedTables: allTables,
+                            availableColumns: columns
+                        }
+                    });
+
+                    // Now that state has been updated, run validations, and update UI messages.
+                    dispatch({
+                        type: 'UPDATE_UI_MESSAGES',
+                        payload: {
+                            uiMessages: assertAllValidations()
+                        }
+                    })
                 });
         }
     }

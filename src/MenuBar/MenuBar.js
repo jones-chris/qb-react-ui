@@ -9,6 +9,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { removeJoinMetadata } from "../actions/JoinActions";
+import {assertAllValidations} from "../Validators/Validators";
 
 
 class MenuBar extends Component {
@@ -30,6 +31,15 @@ class MenuBar extends Component {
     }
 
     onRunQueryHandler = () => {
+        // Check if query is valid first.
+        const currentMenuBarState = store.getState().menuBar;
+        for (let section in currentMenuBarState) {
+            if (! currentMenuBarState[section].isValid) {
+                alert('Resolve all messages before running the query');
+                return;
+            }
+        }
+
         const currentQueryState = store.getState().query;
         const currentJoinState = store.getState().joins;
 
@@ -87,7 +97,6 @@ class MenuBar extends Component {
             availableDatabases.push(
                 <NavDropdown.Item key={database.databaseName}
                                   onClick={() => this.props.onChangeSelectedDatabase(database)}
-                                  // onClick={() => alert('changed!')}
                 >
                     {database.databaseName} ({database.databaseType})
                 </NavDropdown.Item>
@@ -104,31 +113,31 @@ class MenuBar extends Component {
                             {availableDatabases}
                         </NavDropdown>
 
-                        <Nav.Link className={this.props.elementVisibility.schemasAndTablesElementHidden ? "nav-item" : "nav-item active"}
+                        <Nav.Link className={this.props.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleSchemasAndTablesVisibility}
                         >
                             Schemas & Tables
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.elementVisibility.joinsElementHidden ? "nav-item" : "nav-item active"}
+                        <Nav.Link className={this.props.joins.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleJoinsVisibility}
                         >
                             Joins
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.elementVisibility.columnsElementHidden ? "nav-item" : "nav-item active"}
+                        <Nav.Link className={this.props.columns.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleColumnsVisibility}
                         >
                             Columns
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.elementVisibility.criteriaElementHidden ? "nav-item" : "nav-item active"}
+                        <Nav.Link className={this.props.criteria.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleCriteriaVisibility}
                         >
                             Criteria
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.elementVisibility.otherOptionsElementHidden ? "nav-item" : "nav-item active"}
+                        <Nav.Link className={this.props.otherOptions.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleOtherOptionsVisibility}
                         >
                             Other Options
@@ -190,11 +199,17 @@ const mapDispatchToProps = (dispatch) => {
                     dispatch({
                         type: 'UPDATE_AVAILABLE_SCHEMAS',
                         payload: {
-                            availableSchemas: schemas,
-                            isLoading: false
+                            availableSchemas: schemas
                         }
                     })
                 });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            })
         }
     }
 };

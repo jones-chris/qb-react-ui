@@ -25,7 +25,8 @@ const queryReducer = (state = initialState, action) => {
             };
         case 'CHANGE_SELECTED_DATABASE':
             return {
-                ...state,
+                ...initialState,
+                availableDatabases: state.availableDatabases,
                 selectedDatabase: action.payload.selectedDatabase
             };
         case 'UPDATE_AVAILABLE_SCHEMAS':

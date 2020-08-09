@@ -98,6 +98,7 @@ export const deleteJoinColumn = (joinId, joinColumnIndex) => {
  */
 export const removeJoinMetadata = (joins) => {
     return joins.map(join => {
+        join = Object.assign({}, join);
         delete join.metadata;
         return join;
     })

@@ -9,7 +9,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { removeJoinMetadata } from "../actions/JoinActions";
-import {assertAllValidations} from "../Validators/Validators";
+import { assertAllValidations } from "../Validators/Validators";
 
 
 class MenuBar extends Component {
@@ -20,8 +20,13 @@ class MenuBar extends Component {
         // Get target databases so they can be added to the drop down nav bar.
         let apiUrl = `${store.getState().config.baseApiUrl}/metadata/database`;
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(databases => {
+            .then(response => {
+                if (! response.ok) {
+                    throw Error('Could not retrieve databases')
+                }
+
+                return response.json()
+            }).then(databases => {
                 console.log(databases);
                 this.props.updateAvailableDatabases(databases);
             })
@@ -76,18 +81,28 @@ class MenuBar extends Component {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(response => response.json())
-            .then(json => {
-                console.log(json);
+        }).then(async response => {
+            const data = await response.json();
 
-                // Send json to window's parent so the parent can choose what to do with the data.
-                let parentWindow = store.getState().config.parentWindow;
-                let parentWindowUrl = store.getState().config.parentWindowUrl;
-                parentWindow.postMessage(json, parentWindowUrl);
-            })
-            .catch(reason => {
-                console.error(reason);
-            });
+            if (! response.ok) {
+                if (data.hasOwnProperty('message')) {
+                    throw Error(data.message)
+                } else {
+                    throw Error('An error occurred when running the query')
+                }
+            }
+
+            return data;
+        }).then(json => {
+            console.log(json);
+
+            // Send json to window's parent so the parent can choose what to do with the data.
+            let parentWindow = store.getState().config.parentWindow;
+            let parentWindowUrl = store.getState().config.parentWindowUrl;
+            parentWindow.postMessage(json, parentWindowUrl);
+        }).catch(reason => {
+            alert(reason)
+        });
     };
 
     render() {

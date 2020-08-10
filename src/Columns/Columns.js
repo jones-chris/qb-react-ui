@@ -53,12 +53,12 @@ class Columns extends React.Component {
         }
 
         return (
-            <div id="tableColumns" name="tableColumns" className="table-columns" width="600px" height="191px"
+            <div id="tableColumns" className="table-columns"
                  hidden={this.props.hidden === 'true'}
             >
-                <div id="availableColumnsDiv" className="available-columns-div">
+                <div id="availableColumnsDiv">
                     <label htmlFor="availableColumns">Table Columns</label>
-                    <select id="availableColumns" name="availableColumns" multiple size="25">
+                    <select id="availableColumns" name="availableColumns" multiple size="20">
                         {availableColumns}
                     </select>
                 </div>
@@ -77,9 +77,9 @@ class Columns extends React.Component {
                     >&#8592;</button>
                 </div>
 
-                <div id="selectedColumnsDiv" className="selected-columns-div">
+                <div id="selectedColumnsDiv">
                     <label htmlFor="selectedColumns">Selected Columns</label>
-                    <select id="columns" name="columns" multiple size="25">
+                    <select id="columns" name="columns" multiple size="20">
                         {selectedColumns}
                     </select>
                 </div>

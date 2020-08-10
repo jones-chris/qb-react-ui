@@ -1,7 +1,7 @@
 .table-columns {
     margin: auto;
     text-align: center;
-    display: inline-block;
+    display: flex;
 }
 
 .available-columns-buttons-div {
@@ -9,6 +9,7 @@
     padding-left: 20px;
     padding-right: 20px;
     text-align: center;
+    flex: .2;
 }
 
 #addRemoveColumns {
@@ -23,8 +24,9 @@
 #availableColumnsDiv {
     float: left;
     display: grid;
-    width: 300px;
+    width: 30%;
     padding-left: 5%;
+    flex: 1;
 }
 
 #availableColumns {
@@ -33,8 +35,10 @@
 
 #selectedColumnsDiv {
     float: left;
-    width: 300px;
+    width: 30%;
     display: grid;
+    padding-right: 5%;
+    flex: 1;
 }
 
 #selectedColumns {

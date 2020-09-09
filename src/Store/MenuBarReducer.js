@@ -1,4 +1,7 @@
-import * as Constants from '../Config/Constants';
+import {
+    JOINS, SCHEMAS_AND_TABLES, COLUMNS, CRITERIA,
+    OTHER_OPTIONS, QUERY_TEMPLATES, UPDATE_UI_MESSAGES
+} from '../Config/Constants';
 
 const initialState = {
     queryTemplates: {
@@ -79,31 +82,31 @@ const menuBarReducer = (state = initialState, action) => {
     let newState = JSON.parse(JSON.stringify(state));
 
     switch (action.type) {
-        case Constants.JOINS:
+        case JOINS:
             hideAllElements(newState);
             newState.joins.isHidden = false;
             return newState;
-        case Constants.SCHEMAS_AND_TABLES:
+        case SCHEMAS_AND_TABLES:
             hideAllElements(newState);
             newState.schemasAndTables.isHidden = false;
             return newState;
-        case Constants.COLUMNS:
+        case COLUMNS:
             hideAllElements(newState);
             newState.columns.isHidden = false;
             return newState;
-        case Constants.CRITERIA:
+        case CRITERIA:
             hideAllElements(newState);
             newState.criteria.isHidden = false;
             return newState;
-        case Constants.OTHER_OPTIONS:
+        case OTHER_OPTIONS:
             hideAllElements(newState);
             newState.otherOptions.isHidden = false;
             return newState;
-        case Constants.QUERY_TEMPLATES:
+        case QUERY_TEMPLATES:
             hideAllElements(newState);
             newState.queryTemplates.isHidden = false;
             return newState;
-        case 'UPDATE_UI_MESSAGES':
+        case UPDATE_UI_MESSAGES:
             updateSectionUiMessages(newState, action.payload.uiMessages);
             return newState;
         default:

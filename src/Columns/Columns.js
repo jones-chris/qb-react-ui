@@ -4,6 +4,7 @@ import * as Utils from '../Utils/Utils';
 import { connect } from "react-redux";
 import { store } from '../index';
 import {assertAllValidations} from "../Validators/Validators";
+import {ADD_SELECTED_COLUMN, REMOVE_SELECTED_COLUMN, UPDATE_UI_MESSAGES} from "../Config/Constants";
 
 class Columns extends React.Component {
 
@@ -90,7 +91,10 @@ class Columns extends React.Component {
 }
 
 const mapReduxStateToProps = (reduxState) => {
-    return reduxState.query;
+    return {
+        ...reduxState.query,
+        ...reduxState.databaseMetadata
+    }
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -100,19 +104,19 @@ const mapDispatchToProps = (dispatch) => {
             let newSelectedColumnsFullyQualifiedNames = Utils.getSelectedOptions(availableColumnsSelectElement);
 
             // Get the column JSON object based on newSelectedColumns, which is an array of the column fullyQualifiedNames.
-            let newSelectedColumns = store.getState().query.availableColumns.filter(column => {
+            let newSelectedColumns = store.getState().databaseMetadata.availableColumns.filter(column => {
                 return newSelectedColumnsFullyQualifiedNames.includes(column.fullyQualifiedName);
             });
 
             dispatch({
-                type: 'ADD_SELECTED_COLUMN',
+                type: ADD_SELECTED_COLUMN,
                 payload: {
                     selectedColumns: newSelectedColumns
                 }
             });
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }
@@ -127,14 +131,14 @@ const mapDispatchToProps = (dispatch) => {
             });
 
             dispatch({
-                type: 'REMOVE_SELECTED_COLUMN',
+                type: REMOVE_SELECTED_COLUMN,
                 payload: {
                     selectedColumns: newSelectedColumns
                 }
             });
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }

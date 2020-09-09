@@ -1,4 +1,10 @@
 import {store} from "../index";
+import {
+    ADD_SELECTED_COLUMN_VALUES, CLOSE_COLUMN_VALUES_MODAL, REMOVE_SELECTED_COLUMN_VALUES,
+    SHOW_COLUMN_VALUES_MODAL,
+    UPDATE_AVAILABLE_COLUMN_MEMBERS, UPDATE_COLUMN_VALUES_ASCENDING,
+    UPDATE_COLUMN_VALUES_LIMIT, UPDATE_COLUMN_VALUES_SEARCH
+} from "../Config/Constants";
 
 const initialState = {
     hideColumnMembersModal: true,
@@ -10,7 +16,7 @@ const modalReducer = (state = initialState, action) => {
     let newState = JSON.parse(JSON.stringify(state));
 
     switch (action.type) {
-        case 'SHOW_COLUMN_VALUES_MODAL':
+        case SHOW_COLUMN_VALUES_MODAL:
             // Create Column Values initial state.
             let initialColumnValuesModalState = {
                 target: {
@@ -38,16 +44,16 @@ const modalReducer = (state = initialState, action) => {
             newState.columnValueModal = initialColumnValuesModalState;
 
             return newState;
-        case 'UPDATE_COLUMN_VALUES_LIMIT':
+        case UPDATE_COLUMN_VALUES_LIMIT:
             newState.columnValueModal.limit = action.payload.newLimit;
             return newState;
-        case 'UPDATE_COLUMN_VALUES_ASCENDING':
+        case UPDATE_COLUMN_VALUES_ASCENDING:
             newState.columnValueModal.ascending = action.payload.newAscending;
             return newState;
-        case 'UPDATE_COLUMN_VALUES_SEARCH':
+        case UPDATE_COLUMN_VALUES_SEARCH:
             newState.columnValueModal.search = action.payload.newSearch;
             return newState;
-        case 'UPDATE_AVAILABLE_COLUMN_MEMBERS':
+        case UPDATE_AVAILABLE_COLUMN_MEMBERS:
             // If this is the first pagination, set `firstPaginationOccurred` to true, so that Limit, Offset, and Search
             // can be disabled in the Column Values modal UI.
             if (! newState.columnValueModal.firstPaginationOccurred) {
@@ -68,19 +74,19 @@ const modalReducer = (state = initialState, action) => {
             newState.columnValueModal.disableNextPageButton = action.payload.disableNextPageButton;
 
             return newState;
-        case 'ADD_SELECTED_COLUMN_VALUES':
+        case ADD_SELECTED_COLUMN_VALUES:
             action.payload.columnValuesToAdd.forEach(columnValue => {
                 newState.columnValueModal.selectedColumnValues.push(columnValue);
             });
 
             return newState;
-        case 'REMOVE_SELECTED_COLUMN_VALUES':
+        case REMOVE_SELECTED_COLUMN_VALUES:
             newState.columnValueModal.selectedColumnValues = newState.columnValueModal.selectedColumnValues.filter(columnValue => {
                 return ! action.payload.columnValuesToRemove.includes(columnValue);
             });
 
             return newState;
-        case 'CLOSE_COLUMN_VALUES_MODAL':
+        case CLOSE_COLUMN_VALUES_MODAL:
             return initialState;
         default:
             return state;

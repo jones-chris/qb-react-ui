@@ -10,6 +10,7 @@ import queryReducer from "./Store/QueryReducer";
 import { Provider } from 'react-redux'
 import configReducer from "./Store/ConfigReducer";
 import modalReducer from './Store/ModalReducer';
+import databaseMetadataReducer from "./Store/DatabaseMetadataReducer";
 
 export const store = createStore(combineReducers(
     {
@@ -17,7 +18,8 @@ export const store = createStore(combineReducers(
         menuBar: menuBarReducer,
         joins: joinReducer,
         query: queryReducer,
-        modal: modalReducer
+        modal: modalReducer,
+        databaseMetadata: databaseMetadataReducer
     }
 ));
 

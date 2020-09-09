@@ -1,7 +1,7 @@
 import * as Constants from "../Config/Constants";
 import cloneDeep from 'lodash/cloneDeep';
 import * as Utils from "../Utils/Utils";
-
+import { ADD_JOIN, DELETE_JOIN, CHANGE_JOIN_TYPE, CHANGE_TABLE, CHANGE_COLUMN, ADD_JOIN_COLUMN, DELETE_JOIN_COLUMN } from "../Config/Constants";
 
 const initialState = {
     joins: []
@@ -12,7 +12,7 @@ const joinReducer = (state = initialState, action) => {
     let newJoins = cloneDeep(state.joins);
 
     switch (action.type) {
-        case 'ADD_JOIN':
+        case ADD_JOIN:
             // Create a new join object and add it to the state's `joins` item.
             newJoins.push({
                 joinType: Constants.JOIN_IMAGES[0].name,
@@ -34,7 +34,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'DELETE_JOIN':
+        case DELETE_JOIN:
             let joinId = parseInt(action.payload.joinId);
 
             // Create new array of joins that excludes the id being deleted.
@@ -47,7 +47,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'CHANGE_JOIN_TYPE':
+        case CHANGE_JOIN_TYPE:
             // Get next join image based on currentJoinType.
             joinId = parseInt(action.payload.joinId);
             let currentJoinType = state.joins.find(join => join.metadata.id === joinId).joinType;
@@ -83,7 +83,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'CHANGE_TABLE':
+        case CHANGE_TABLE:
             let parentTableName = Utils.getSelectedOptions(document.getElementById(action.payload.parentTableElementName))[0];
             let parentTableObject = action.payload.availableTables.find(table => { return table.fullyQualifiedName === parentTableName; });
 
@@ -128,7 +128,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'CHANGE_COLUMN':
+        case CHANGE_COLUMN:
             let parentColumnEl = document.getElementById(action.payload.parentJoinColumnsElementId);
             let index = parseInt(parentColumnEl.getAttribute('data-index'));
 
@@ -149,7 +149,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'ADD_JOIN_COLUMN':
+        case ADD_JOIN_COLUMN:
             newJoins.forEach(join => {
                 // Get first available parent column and first available target column.
                 let firstAvailableParentColumn = join.parentJoinColumns[0];
@@ -166,7 +166,7 @@ const joinReducer = (state = initialState, action) => {
                 ...state,
                 joins: newJoins
             };
-        case 'DELETE_JOIN_COLUMN':
+        case DELETE_JOIN_COLUMN:
             newJoins.forEach(join => {
                 if (join.metadata.id === action.payload.joinId) {
                     // Remove the parent join column and target join column at the joinColumnIndex.

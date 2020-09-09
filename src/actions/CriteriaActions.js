@@ -1,4 +1,5 @@
 import {store} from "../index";
+import {ADD_CRITERIA, UPDATE_CRITERIA} from "../Config/Constants";
 
 export const addCriterion = (parentCriterion) => {
     // Copy the state's criteria to a new array.
@@ -44,7 +45,7 @@ export const addCriterion = (parentCriterion) => {
 
     setCriterionMetadata(newCriteria);
 
-    return { type: 'ADD_CRITERIA', payload: { newCriteria: newCriteria } };
+    return { type: ADD_CRITERIA, payload: { newCriteria: newCriteria } };
 };
 
 export const updateCriterion = (criterion, criterionObjectAttributeName, value) => {
@@ -58,7 +59,7 @@ export const updateCriterion = (criterion, criterionObjectAttributeName, value) 
         }
     });
 
-    return { type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } };
+    return { type: UPDATE_CRITERIA, payload: { newCriteria: newCriteria } };
 };
 
 export const deleteCriterion = (criterionToDelete) => {
@@ -68,7 +69,7 @@ export const deleteCriterion = (criterionToDelete) => {
 
     setCriterionMetadata(newCriteria);
 
-    return { type: 'UPDATE_CRITERIA', payload: { newCriteria: newCriteria } };
+    return { type: UPDATE_CRITERIA, payload: { newCriteria: newCriteria } };
 };
 
 const recursivelySearchAndDeleteCriterion = (criteria, criterionToDelete) => {

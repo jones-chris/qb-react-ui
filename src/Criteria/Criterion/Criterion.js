@@ -6,6 +6,8 @@ import { addCriterion, updateCriterion, deleteCriterion } from "../../actions/Cr
 import { store } from "../../index";
 import _ from 'lodash';
 import {assertAllValidations} from "../../Validators/Validators";
+import {UPDATE_UI_MESSAGES} from "../../Config/Constants";
+import {SHOW_COLUMN_VALUES_MODAL} from "../../Config/Constants";
 
 class Criterion extends React.Component {
 
@@ -118,7 +120,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(updateCriterion(criterion, criterionObjectAttributeName, columnObject));
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }
@@ -128,7 +130,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(updateCriterion(criterion, criterionObjectAttributeName, value));
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }
@@ -138,7 +140,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(deleteCriterion(criterionId));
         },
         onShowColumnValuesModal: (targetObject, targetAttribute) => dispatch({
-            type: 'SHOW_COLUMN_VALUES_MODAL',
+            type: SHOW_COLUMN_VALUES_MODAL,
             payload: {
                 hide: false,
                 target: {

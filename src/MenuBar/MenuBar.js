@@ -10,6 +10,10 @@ import Button from "react-bootstrap/Button";
 import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { removeJoinMetadata } from "../actions/JoinActions";
 import {assertAllValidations} from "../Validators/Validators";
+import {UPDATE_AVAILABLE_DATABASES} from "../Config/Constants";
+import {CHANGE_SELECTED_DATABASE} from "../Config/Constants";
+import {UPDATE_AVAILABLE_SCHEMAS} from "../Config/Constants";
+import {UPDATE_UI_MESSAGES} from "../Config/Constants";
 
 
 class MenuBar extends Component {
@@ -93,7 +97,7 @@ class MenuBar extends Component {
     render() {
         // Create database NavDropdown.Item JSX.
         let availableDatabases = [];
-        store.getState().query.availableDatabases.forEach(database => {
+        this.props.availableDatabases.forEach(database => {
             availableDatabases.push(
                 <NavDropdown.Item key={database.databaseName}
                                   onClick={() => this.props.onChangeSelectedDatabase(database)}
@@ -159,7 +163,7 @@ class MenuBar extends Component {
 const mapReduxStateToProps = (reduxState) => {
     return {
         ...reduxState.menuBar,
-        ...reduxState.query
+        ...reduxState.databaseMetadata
     }
 };
 
@@ -173,7 +177,7 @@ const mapDispatchToProps = (dispatch) => {
         toggleOtherOptionsVisibility: () => dispatch({ type: Constants.OTHER_OPTIONS }),
         updateAvailableDatabases: (availableDatabases) => {
             dispatch({
-                type: 'UPDATE_AVAILABLE_DATABASES',
+                type: UPDATE_AVAILABLE_DATABASES,
                 payload: {
                     availableDatabases: availableDatabases
                 }
@@ -182,7 +186,7 @@ const mapDispatchToProps = (dispatch) => {
         onChangeSelectedDatabase: (selectedDatabase) => {
             // Update selected database.
             dispatch({
-                type: 'CHANGE_SELECTED_DATABASE',
+                type: CHANGE_SELECTED_DATABASE,
                 payload: {
                     selectedDatabase: selectedDatabase
                 }
@@ -197,7 +201,7 @@ const mapDispatchToProps = (dispatch) => {
 
                     // Update the schemas in the redux state.
                     dispatch({
-                        type: 'UPDATE_AVAILABLE_SCHEMAS',
+                        type: UPDATE_AVAILABLE_SCHEMAS,
                         payload: {
                             availableSchemas: schemas
                         }
@@ -205,7 +209,7 @@ const mapDispatchToProps = (dispatch) => {
                 });
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }

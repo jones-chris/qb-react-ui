@@ -1,11 +1,15 @@
+import {
+    ADD_CRITERIA, ADD_SELECTED_COLUMN, CHANGE_SELECTED_DATABASE,
+    IMPORT_QUERY_TEMPLATE, REMOVE_SELECTED_COLUMN, SELECT_SCHEMA, SELECT_TABLE,
+    UPDATE_COLUMN_VALUES_MODAL_TARGET,
+    UPDATE_CRITERIA, UPDATE_DISTINCT,
+    UPDATE_LIMIT, UPDATE_OFFSET, UPDATE_SUPPRESS_NULLS
+} from "../Config/Constants";
+
 const initialState = {
-    availableDatabases: [],
     selectedDatabase: null,
-    availableSchemas: [],
     selectedSchemas: [],
-    availableTables: [],
     selectedTables: [],
-    availableColumns: [],
     selectedColumns: [],
     criteria: [],
     joins: [],
@@ -18,80 +22,68 @@ const initialState = {
 
 const queryReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'UPDATE_AVAILABLE_DATABASES':
-            return {
-                ...state,
-                availableDatabases: action.payload.availableDatabases
-            };
-        case 'CHANGE_SELECTED_DATABASE':
+        case CHANGE_SELECTED_DATABASE:
             return {
                 ...initialState,
                 availableDatabases: state.availableDatabases,
                 selectedDatabase: action.payload.selectedDatabase
             };
-        case 'UPDATE_AVAILABLE_SCHEMAS':
+        case SELECT_SCHEMA:
             return {
                 ...state,
-                availableSchemas:  action.payload.availableSchemas
+                selectedSchemas: action.payload.selectedSchemas
             };
-        case 'SELECT_SCHEMA':
+        case SELECT_TABLE:
             return {
                 ...state,
-                selectedSchemas: action.payload.selectedSchemas,
-                availableTables: action.payload.tables
+                selectedTables: action.payload.selectedTables
             };
-        case 'SELECT_TABLE':
-            return {
-                ...state,
-                selectedTables: action.payload.selectedTables,
-                availableColumns: action.payload.availableColumns
-            };
-        case 'ADD_SELECTED_COLUMN':
+        case ADD_SELECTED_COLUMN:
             return {
                 ...state,
                 selectedColumns: action.payload.selectedColumns
             };
-        case 'REMOVE_SELECTED_COLUMN':
+        case REMOVE_SELECTED_COLUMN:
             return {
                 ...state,
                 selectedColumns: action.payload.selectedColumns
             };
-        case 'UPDATE_DISTINCT':
+        case UPDATE_DISTINCT:
             return {
                 ...state,
                 distinct: ! state.distinct
             };
-        case 'UPDATE_SUPPRESS_NULLS':
+        case UPDATE_SUPPRESS_NULLS:
             return {
                 ...state,
                 suppressNulls: ! state.suppressNulls
             };
-        case 'UPDATE_LIMIT':
+        case UPDATE_LIMIT:
             return {
                 ...state,
                 limit: action.payload.newLimit
             };
-        case 'UPDATE_OFFSET':
+        case UPDATE_OFFSET:
             return {
                 ...state,
                 offset: action.payload.newOffset
             };
-        case 'ADD_CRITERIA':
+        case ADD_CRITERIA:
             return {
                 ...state,
                 criteria: action.payload.newCriteria
             };
-        case 'UPDATE_CRITERIA':
+        case UPDATE_CRITERIA:
             return {
                 ...state,
                 criteria: action.payload.newCriteria
             };
-        case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
+        case UPDATE_COLUMN_VALUES_MODAL_TARGET:
             return {
                 ...state,
                 criteria: action.payload.newCriteria
             };
-        case 'IMPORT_QUERY_TEMPLATE':
+        case IMPORT_QUERY_TEMPLATE:
             let queryTemplate = action.payload.queryTemplate;
 
             return {

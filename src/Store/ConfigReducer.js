@@ -1,3 +1,5 @@
+import { ADD_BASE_API_URL } from "../Config/Constants";
+
 const initialState = {
     parentWindow: null,
     parentWindowUrl: '',
@@ -8,7 +10,7 @@ const initialState = {
 const configReducer = (state = initialState, action) => {
 
     switch (action.type) {
-        case 'ADD_BASE_API_URL':
+        case ADD_BASE_API_URL:
             return {
                 ...state,
                 parentWindow: action.payload.parentWindow,

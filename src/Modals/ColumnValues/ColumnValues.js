@@ -5,6 +5,17 @@ import {connect} from "react-redux";
 import * as Utils from "../../Utils/Utils";
 import _ from 'lodash';
 import {assertAllValidations} from "../../Validators/Validators";
+import {
+    ADD_SELECTED_COLUMN_VALUES,
+    CLOSE_COLUMN_VALUES_MODAL,
+    REMOVE_SELECTED_COLUMN_VALUES,
+    UPDATE_AVAILABLE_COLUMN_MEMBERS,
+    UPDATE_COLUMN_VALUES_ASCENDING,
+    UPDATE_COLUMN_VALUES_LIMIT,
+    UPDATE_COLUMN_VALUES_MODAL_TARGET,
+    UPDATE_COLUMN_VALUES_SEARCH,
+    UPDATE_UI_MESSAGES
+} from "../../Config/Constants";
 
 class ColumnValues extends React.Component {
 
@@ -188,7 +199,7 @@ const mapDispatchToProps = (dispatch) => {
 
             // Dispatch action to update criteria.
             dispatch({
-                type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
+                type: UPDATE_COLUMN_VALUES_MODAL_TARGET,
                 payload: {
                     newCriteria: newCriteria
                 }
@@ -196,11 +207,11 @@ const mapDispatchToProps = (dispatch) => {
 
             // Dispatch action to close Column Values modal.
             dispatch({
-                type: 'CLOSE_COLUMN_VALUES_MODAL',
+                type: CLOSE_COLUMN_VALUES_MODAL,
             });
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }
@@ -208,12 +219,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         onCloseColumnValues: () => {
             dispatch({
-                type: 'CLOSE_COLUMN_VALUES_MODAL',
+                type: CLOSE_COLUMN_VALUES_MODAL,
             });
         },
         onLimitChange: (limit) => {
             dispatch({
-                type: 'UPDATE_COLUMN_VALUES_LIMIT',
+                type: UPDATE_COLUMN_VALUES_LIMIT,
                 payload: {
                     newLimit: limit
                 }
@@ -221,7 +232,7 @@ const mapDispatchToProps = (dispatch) => {
         },
         onAscendingChange: (ascending) => {
             dispatch({
-                type: 'UPDATE_COLUMN_VALUES_ASCENDING',
+                type: UPDATE_COLUMN_VALUES_ASCENDING,
                 payload: {
                     newAscending: ascending
                 }
@@ -229,7 +240,7 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSearchChange: (search) => {
             dispatch({
-                type: 'UPDATE_COLUMN_VALUES_SEARCH',
+                type: UPDATE_COLUMN_VALUES_SEARCH,
                 payload: {
                     newSearch: search
                 }
@@ -273,7 +284,7 @@ const mapDispatchToProps = (dispatch) => {
                     }
 
                     dispatch({
-                        type: 'UPDATE_AVAILABLE_COLUMN_MEMBERS',
+                        type: UPDATE_AVAILABLE_COLUMN_MEMBERS,
                         payload: {
                             newColumnValues: newColumnValues,
                             uiMessage: uiMessage,
@@ -321,7 +332,7 @@ const mapDispatchToProps = (dispatch) => {
                     newColumnValues = columnValues.data.flatMap(row => [row[0]]);
 
                     dispatch({
-                        type: 'UPDATE_AVAILABLE_COLUMN_MEMBERS',
+                        type: UPDATE_AVAILABLE_COLUMN_MEMBERS,
                         payload: {
                             newColumnValues: newColumnValues,
                             uiMessage: uiMessage,
@@ -343,7 +354,7 @@ const mapDispatchToProps = (dispatch) => {
             });
 
             dispatch({
-                type: 'ADD_SELECTED_COLUMN_VALUES',
+                type: ADD_SELECTED_COLUMN_VALUES,
                 payload: {
                     columnValuesToAdd: selectedAvailableColumnValues
                 }
@@ -354,7 +365,7 @@ const mapDispatchToProps = (dispatch) => {
             let columnValuesToRemove = Utils.getSelectedOptions(selectedColumnValuesElement);
 
             dispatch({
-                type: 'REMOVE_SELECTED_COLUMN_VALUES',
+                type: REMOVE_SELECTED_COLUMN_VALUES,
                 payload: {
                     columnValuesToRemove: columnValuesToRemove
                 }

@@ -4,6 +4,13 @@ import { connect } from "react-redux";
 import { store } from '../index';
 import * as Utils from "../Utils/Utils";
 import { assertAllValidations } from "../Validators/Validators";
+import {
+    SELECT_SCHEMA,
+    SELECT_TABLE,
+    UPDATE_AVAILABLE_COLUMNS,
+    UPDATE_AVAILABLE_SCHEMAS,
+    UPDATE_AVAILABLE_TABLES, UPDATE_UI_MESSAGES
+} from "../Config/Constants";
 
 
 class SchemasAndTables extends Component {
@@ -86,7 +93,10 @@ class SchemasAndTables extends Component {
 }
 
 const mapReduxStateToProps = (reduxState) => {
-    return reduxState.query;
+    return {
+        ...reduxState.databaseMetadata,
+        ...reduxState.query
+    };
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -95,7 +105,7 @@ const mapDispatchToProps = (dispatch) => {
             let newSelectedSchemasFullyQualifiedNames = Utils.getSelectedOptions(target);
 
             // Get schema object that has been selected.
-            let selectedSchemaObjects = store.getState().query.availableSchemas.filter(schema => newSelectedSchemasFullyQualifiedNames.includes(schema.fullyQualifiedName));
+            let selectedSchemaObjects = store.getState().databaseMetadata.availableSchemas.filter(schema => newSelectedSchemasFullyQualifiedNames.includes(schema.fullyQualifiedName));
 
             // Create a string with the schema names joined together with `&` to be used in API call.
             let joinedSchemaString = selectedSchemaObjects.map(schema => schema.schemaName).join('&');
@@ -108,15 +118,21 @@ const mapDispatchToProps = (dispatch) => {
                     console.log(tables);
 
                     dispatch({
-                        type: 'SELECT_SCHEMA',
+                        type: SELECT_SCHEMA,
                         payload: {
-                            selectedSchemas: selectedSchemaObjects,
-                            tables: tables
+                            selectedSchemas: selectedSchemaObjects
                         }
                     });
 
                     dispatch({
-                        type: 'UPDATE_UI_MESSAGES',
+                        type: UPDATE_AVAILABLE_TABLES,
+                        payload: {
+                            availableTables: tables
+                        }
+                    });
+
+                    dispatch({
+                        type: UPDATE_UI_MESSAGES,
                         payload: {
                             uiMessages: assertAllValidations()
                         }
@@ -127,7 +143,7 @@ const mapDispatchToProps = (dispatch) => {
             let newSelectedTableFullyQualifiedNames = Utils.getSelectedOptions(target);
 
             // Get the table object for the table that was selected.
-            let allTables = store.getState().query.availableTables.filter(table => newSelectedTableFullyQualifiedNames.includes(table.fullyQualifiedName));
+            let allTables = store.getState().databaseMetadata.availableTables.filter(table => newSelectedTableFullyQualifiedNames.includes(table.fullyQualifiedName));
 
             // Get table columns for all selected tables.
             let apiUrl = `${store.getState().config.baseApiUrl}/metadata/database/schema/table/column`;
@@ -142,16 +158,22 @@ const mapDispatchToProps = (dispatch) => {
                     console.log(columns);
 
                     dispatch({
-                        type: 'SELECT_TABLE',
+                        type: SELECT_TABLE,
                         payload: {
-                            selectedTables: allTables,
+                            selectedTables: allTables
+                        }
+                    });
+
+                    dispatch({
+                        type: UPDATE_AVAILABLE_COLUMNS,
+                        payload: {
                             availableColumns: columns
                         }
                     });
 
                     // Now that state has been updated, run validations, and update UI messages.
                     dispatch({
-                        type: 'UPDATE_UI_MESSAGES',
+                        type: UPDATE_UI_MESSAGES,
                         payload: {
                             uiMessages: assertAllValidations()
                         }

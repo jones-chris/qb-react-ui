@@ -12,6 +12,7 @@ import {
     deleteJoinColumn
 } from "../actions/JoinActions";
 import {assertAllValidations} from "../Validators/Validators";
+import {UPDATE_UI_MESSAGES} from "../Config/Constants";
 
 
 class Joins extends Component {
@@ -177,7 +178,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(addJoin());
 
             dispatch({
-                type: 'UPDATE_UI_MESSAGES',
+                type: UPDATE_UI_MESSAGES,
                 payload: {
                     uiMessages: assertAllValidations()
                 }

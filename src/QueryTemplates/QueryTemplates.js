@@ -3,6 +3,7 @@ import './QueryTemplates.css'
 import {store} from "../index";
 import {connect} from "react-redux";
 import * as Utils from "../Utils/Utils";
+import {IMPORT_QUERY_TEMPLATE} from "../Config/Constants";
 
 class QueryTemplates extends React.Component {
 
@@ -137,7 +138,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onImportQueryTemplate: (queryTemplate) => {
             dispatch({
-                type: 'IMPORT_QUERY_TEMPLATE',
+                type: IMPORT_QUERY_TEMPLATE,
                 payload: {
                     queryTemplate: queryTemplate
                 }

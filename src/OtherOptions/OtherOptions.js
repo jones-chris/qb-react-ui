@@ -1,6 +1,7 @@
 import React from 'react';
 import './OtherOptions.css'
 import { connect } from "react-redux";
+import {UPDATE_DISTINCT, UPDATE_LIMIT, UPDATE_OFFSET, UPDATE_SUPPRESS_NULLS} from "../Config/Constants";
 
 const OtherOptions = (props) => {
     return (
@@ -69,10 +70,10 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onDistinctChangeHandler: () => dispatch({ type: 'UPDATE_DISTINCT' }),
-        onSuppressNullsChangeHandler: () => dispatch({ type: 'UPDATE_SUPPRESS_NULLS' }),
-        onLimitChangeHandler: (newLimit) => dispatch({ type: 'UPDATE_LIMIT', payload: { newLimit: newLimit } }),
-        onOffsetChangeHandler: (newOffset) => dispatch({ type: 'UPDATE_OFFSET', payload: { newOffset: newOffset } })
+        onDistinctChangeHandler: () => dispatch({ type: UPDATE_DISTINCT }),
+        onSuppressNullsChangeHandler: () => dispatch({ type: UPDATE_SUPPRESS_NULLS }),
+        onLimitChangeHandler: (newLimit) => dispatch({ type: UPDATE_LIMIT, payload: { newLimit: newLimit } }),
+        onOffsetChangeHandler: (newOffset) => dispatch({ type: UPDATE_OFFSET, payload: { newOffset: newOffset } })
     }
 };
 

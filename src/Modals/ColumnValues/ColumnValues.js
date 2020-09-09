@@ -244,7 +244,8 @@ const mapDispatchToProps = (dispatch) => {
             let tableName = column.tableName;
             let columnName = column.columnName;
 
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${columnValueModalState.offset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.
@@ -295,7 +296,8 @@ const mapDispatchToProps = (dispatch) => {
 
             let newOffset = columnValueModalState.offset - columnValueModalState.limit;
 
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/querybuilder4j/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${newOffset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.

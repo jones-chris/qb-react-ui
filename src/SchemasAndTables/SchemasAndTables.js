@@ -64,7 +64,7 @@ class SchemasAndTables extends Component {
                 <div id="schemasDiv" className="schemas-div" hidden={this.props.hidden === 'true'}>
                     <label htmlFor="schemas">Schemas</label>
 
-                    <select id="schemas" size="20" multiple={true}  // todo:  eventually change this to support multiple schemas.  API will need to support it too.
+                    <select id="schemas" size="20" multiple={true}
                             onChange={(event) => this.props.onSelectSchemaHandler(event.target)}
                     >
                         {availableSchemas}

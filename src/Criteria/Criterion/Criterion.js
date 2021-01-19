@@ -73,7 +73,7 @@ class Criterion extends React.Component {
                 </select>
 
                 <input className="criteria-column-and-filter"
-                       value={criterion.filter}
+                       value={criterion.filter.values.join(',')}
                        onChange={(event) => this.props.onUpdateCriterionHandler(criterion, Constants.FILTER, event.target.value)}
                 />
 

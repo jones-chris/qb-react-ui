@@ -1,4 +1,5 @@
 import {store} from "../index";
+import * as Constants from '../Config/Constants';
 
 export const addCriterion = (parentCriterion) => {
     // Copy the state's criteria to a new array.
@@ -23,7 +24,9 @@ export const addCriterion = (parentCriterion) => {
         conjunction: 'And',
         column: column,
         operator: 'equalTo',
-        filter: '',
+        filter: {
+            values: []
+        },
         childCriteria: [],
         metadata: {
             level: level
@@ -54,7 +57,15 @@ export const updateCriterion = (criterion, criterionObjectAttributeName, value) 
 
     flattenedNewCriteria.forEach(thisCriterion => {
         if (thisCriterion.metadata.id === criterion.metadata.id) {
-            thisCriterion[criterionObjectAttributeName] = value;
+
+            // If the filter is being updated, then split the value into an array before updating the criterion's attribute.
+            if (criterionObjectAttributeName === Constants.FILTER) {
+                const splitValues = value.split(',');
+                thisCriterion[Constants.FILTER].values = splitValues;
+            } else {
+                // Otherwise, just assign the value to the attribute.
+                thisCriterion[criterionObjectAttributeName] = value;
+            }
         }
     });
 
@@ -165,7 +176,7 @@ export const flattenCriteria = (criteria, flattenedCriteriaHolder) => {
 };
 
 /**
- * Removes ciruclar JSON references (the parentCriterion attribute) of each criterion so that each object can be
+ * Removes circular JSON references (the parentCriterion attribute) of each criterion so that each object can be
  * serialized to JSON to be sent to the API.
  *
  * @param criteria The array of criterion.

@@ -54,7 +54,7 @@ export const assertCriteriaOperatorsAreCorrect = () => {
         if (criterion.operator === 'like' || criterion.operator === 'notLike') {
 
             // The filter should have exactly 1 value when using LIKE or NOT LIKE.
-            if (! criterion.filter.values.length !== 1) {
+            if (criterion.filter.values.length !== 1) {
                 throw Error(`A criterion uses the ${criterion.operator.toUpperCase()} operator, but does not have exactly
                 1 filter value`)
             }

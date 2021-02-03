@@ -41,7 +41,7 @@ deploy:
   # variables automatically when `aws s3 cp` is called.  So there is no need to run `aws configure`.
   - provider: script
     skip_cleanup: true
-    script: ./cicd/deployment/s3_deployment.sh
+    script: bash ./cicd/deployment/s3_deployment.sh
     on:
       all_branches: true
 

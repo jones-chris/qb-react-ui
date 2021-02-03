@@ -98,7 +98,7 @@ export const assertCriteriaFiltersAreCorrect = () => {
         if (jdbcDataType === BOOLEAN) {
             criterion.filter.values.forEach(value => {
                 let lowerCaseValue = value.toString().toLowerCase();
-                if (value !== 'true' && value !== 'false') {
+                if (lowerCaseValue !== 'true' && lowerCaseValue !== 'false') {
                     throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);
                 }
             })

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './Joins.css'
 import {connect} from "react-redux";
-import { store } from '../index';
 import {
     addJoin,
     deleteJoin,

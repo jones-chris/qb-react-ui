@@ -6,6 +6,10 @@ git:
 
 cache: npm
 
+env:
+  # Don't treat react-scripts build warnings as errors.
+  CI: false
+
 os:
   - linux
 

@@ -3,6 +3,7 @@ import Criterion from "./Criterion/Criterion";
 import './Criteria.css';
 import { connect } from "react-redux";
 import { addCriterion } from "../actions/CriteriaActions";
+import {assertAllValidations} from "../Validators/Validators";
 
 class Criteria extends React.Component {
 
@@ -56,6 +57,13 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onAddCriterionHandler: (parentId, ) => {
             dispatch(addCriterion(parentId));
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
         }
     }
 };

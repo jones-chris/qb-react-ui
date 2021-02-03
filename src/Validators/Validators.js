@@ -1,6 +1,7 @@
 import {store} from "../index";
 import {UiMessage} from "../Models/UiMessage";
-import {getJdbcSqlType, BIG_INT, BOOLEAN, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT} from "../Utils/Utils"
+import {getJdbcSqlType, BIG_INT, BOOLEAN, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT} from "../Utils/Utils";
+import {flattenCriteria} from "../actions/CriteriaActions";
 
 export const assertDatabaseIsSelected = () => {
     if (store.getState().query.selectedDatabase === null) {
@@ -42,6 +43,7 @@ export const assertColumnsAreSelected = () => {
 
 export const assertCriteriaOperatorsAreCorrect = () => {
     let criteria = store.getState().query.criteria;
+    criteria = flattenCriteria(criteria, []);
     criteria.forEach(criterion => {
         // IN and NOT IN operator check.
         if (criterion.filter.values.length > 1) {
@@ -59,21 +61,35 @@ export const assertCriteriaOperatorsAreCorrect = () => {
                 1 filter value`)
             }
         }
+
+        // If the operator is NOT isNull or isNotNull, then filter values, sub queries, or parameters should not be empty.
+        if (criterion.operator !== 'isNull' && criterion.operator !== 'isNotNull') {
+            if (criterion.filter.values.length === 0 && criterion.filter.subQueries.length === 0 && criterion.filter.parameters.length === 0) {
+                throw Error(`A criterion has an empty filter, but has a ${criterion.operator.toUpperCase()} operator`);
+            }
+        }
     })
 };
 
 export const assertCriteriaFiltersAreCorrect = () => {
     let criteria = store.getState().query.criteria;
+    criteria = flattenCriteria(criteria, []);
     criteria.forEach(criterion => {
+        // Check that the criterion's filter's values property does not contain an empty string.
+        criterion.filter.values.forEach(value => {
+            if (value === '') {
+                throw Error('The criterion contains an empty/blank string')
+            }
+        });
 
         // If data type is not string, then check that the filter values can be converted to int, double, etc.
         let jdbcDataType = getJdbcSqlType(criterion.column.dataType);
-        if (jdbcDataType === BIG_INT || jdbcDataType === DECIMAL || jdbcDataType === DOUBLE || jdbcDataType === FLOAT ||
-            jdbcDataType === INTEGER || jdbcDataType === NUMERIC || jdbcDataType === SMALL_INT || jdbcDataType === TINY_INT) {
+        let numericJdbcTypes = [BIG_INT, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT];
+        if (numericJdbcTypes.includes(jdbcDataType)) {
             criterion.filter.values.forEach(value => {
                 let valueAsNumber = Number(value);
                 if (isNaN(valueAsNumber)) {
-                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a ${jdbcDataType}`);
+                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);
                 }
             })
         }
@@ -83,7 +99,7 @@ export const assertCriteriaFiltersAreCorrect = () => {
             criterion.filter.values.forEach(value => {
                 let lowerCaseValue = value.toString().toLowerCase();
                 if (value !== 'true' && value !== 'false') {
-                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a ${jdbcDataType}`);
+                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);
                 }
             })
         }

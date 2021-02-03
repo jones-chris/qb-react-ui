@@ -110,6 +110,13 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onAddCriterionHandler: (parentCriterion) => {
             dispatch(addCriterion(parentCriterion));
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
         },
         onUpdateCriterionColumnHandler: (criterion, criterionObjectAttributeName, value) => {
             // Get the column object.
@@ -136,17 +143,33 @@ const mapDispatchToProps = (dispatch) => {
         },
         onDeleteCriterionHandler: (criterionId) => {
             dispatch(deleteCriterion(criterionId));
-        },
-        onShowColumnValuesModal: (targetObject, targetAttribute) => dispatch({
-            type: 'SHOW_COLUMN_VALUES_MODAL',
-            payload: {
-                hide: false,
-                target: {
-                    object: targetObject,
-                    attribute: targetAttribute
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
                 }
-            }
-        })
+            });
+        },
+        onShowColumnValuesModal: (targetObject, targetAttribute) => {
+            dispatch({
+                type: 'SHOW_COLUMN_VALUES_MODAL',
+                payload: {
+                    hide: false,
+                    target: {
+                        object: targetObject,
+                        attribute: targetAttribute
+                    }
+                }
+            });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+        }
     }
 };
 

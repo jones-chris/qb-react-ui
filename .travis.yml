@@ -1,0 +1,60 @@
+language: node_js
+
+git:
+  depth: 1
+  submodules: false
+
+cache: npm
+
+env:
+  # Don't treat react-scripts build warnings as errors.
+  CI: false
+
+os:
+  - linux
+
+node_js:
+  - 12
+
+addons:
+  apt:
+    update: true
+
+# Install aws cli.
+before_install:
+  - sudo apt-get -y install awscli
+
+# Output some information about the environment.  Install dependencies.
+before_script:
+  - lsb_release -a
+  - pwd
+  - npm install
+
+script:
+  # Build the react app.  The `package.json` file shows that `npm build` maps to the `react-scripts build` command,
+  # which is why it was installed in the pre-build phase.
+  - npm run build
+
+deploy:
+  # Upload the artifact to S3.  The AWS access key id, secret access key, and default region are exported as environment
+  # variables earlier in the build from the Travis project's settings, so the AWS CLI will look for those environment
+  # variables automatically when `aws s3 cp` is called.  So there is no need to run `aws configure`.
+  - provider: script
+    skip_cleanup: true
+    script: bash ./cicd/deployment/s3_deployment.sh
+    on:
+      all_branches: true
+
+  # To understand ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}, see this:  https://unhashable.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
+#  - provider: script
+#    script: bash ./cicd/deployment/swarm_deployment.sh "$PROJECT_VERSION"
+#    on:
+#      branch: "${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} = master"
+#
+#  # Deploy the new image to a lightsail instance and run a single container with the app, if the a branch other than
+#  # master triggered the job.
+#  - provider: script
+#    script: bash ./cicd/deployment/swarm_deployment.sh "$PROJECT_VERSION"
+#    on:
+#      all_branches: true
+#      condition: "${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} != master"

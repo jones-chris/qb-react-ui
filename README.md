@@ -1,4 +1,4 @@
-# qb-react-ui
+# qb4j-ui [![Build Status](https://travis-ci.com/jones-chris/qb-react-ui.svg?branch=master)](https://travis-ci.com/jones-chris/qb-react-ui)
 
 ## Deployment
 The cloudformation template in the `/cloudformation` directory can be used to create the following resources:

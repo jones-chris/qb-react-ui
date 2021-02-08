@@ -1,4 +1,10 @@
 const initialState = {
+    queryMetadata: {
+        name: '',
+        discoverable: false,
+        description: '',
+        parameters: []
+    },
     availableDatabases: [],
     selectedDatabase: null,
     availableSchemas: [],
@@ -98,6 +104,10 @@ const queryReducer = (state = initialState, action) => {
                 ...state,
                 selectedColumns: queryTemplate.columns //todo:  finish this once qb4j lib's data models are corrected to match web app and front end.
             };
+        case 'TOGGLE_DISCOVERABLE':
+            let newState = {...state};
+            newState.queryMetadata.discoverable = action.payload.discoverable;
+            return newState;
         default:
             return state;
     }

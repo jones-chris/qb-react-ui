@@ -11,6 +11,7 @@ import ColumnValues from "./Modals/ColumnValues/ColumnValues";
 import QueryTemplates from "./QueryTemplates/QueryTemplates";
 import Warnings from "./Warnings/Warnings";
 import {assertAllValidations} from "./Validators/Validators";
+import SaveQuery from "./Modals/SaveQuery/SaveQuery";
 
 
 class App extends React.Component {
@@ -69,6 +70,10 @@ class App extends React.Component {
                 <ColumnValues
                     hidden={this.props.modal.hideColumnMembersModal.toString()}
                     modalState={this.props.modal.columnValueModal}
+                />
+
+                <SaveQuery
+                    show={(this.props.modal.hideSaveQueryModal) ? 'false' : 'true'}
                 />
 
             </div>

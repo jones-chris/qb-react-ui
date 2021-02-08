@@ -1,6 +1,6 @@
 import {store} from "../index";
 import {UiMessage} from "../Models/UiMessage";
-import {getJdbcSqlType, BIG_INT, BOOLEAN, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT} from "../Utils/Utils";
+import {getJdbcSqlType, BIG_INT, BOOLEAN, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT, getCriterionFilterValues} from "../Utils/Utils";
 import {flattenCriteria} from "../actions/CriteriaActions";
 
 export const assertDatabaseIsSelected = () => {
@@ -62,9 +62,9 @@ export const assertCriteriaOperatorsAreCorrect = () => {
             }
         }
 
-        // If the operator is NOT isNull or isNotNull, then filter values, sub queries, or parameters should not be empty.
+        // If the operator is NOT isNull or isNotNull, then filter values should not be empty.
         if (criterion.operator !== 'isNull' && criterion.operator !== 'isNotNull') {
-            if (criterion.filter.values.length === 0 && criterion.filter.subQueries.length === 0 && criterion.filter.parameters.length === 0) {
+            if (criterion.filter.values.length === 0) {
                 throw Error(`A criterion has an empty filter, but has a ${criterion.operator.toUpperCase()} operator`);
             }
         }
@@ -85,8 +85,9 @@ export const assertCriteriaFiltersAreCorrect = () => {
         // If data type is not string, then check that the filter values can be converted to int, double, etc.
         let jdbcDataType = getJdbcSqlType(criterion.column.dataType);
         let numericJdbcTypes = [BIG_INT, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT];
+        let criterionFilterValuesExcludingParamsAndSubQueries = getCriterionFilterValues(criterion);
         if (numericJdbcTypes.includes(jdbcDataType)) {
-            criterion.filter.values.forEach(value => {
+            criterionFilterValuesExcludingParamsAndSubQueries.forEach(value => {
                 let valueAsNumber = Number(value);
                 if (isNaN(valueAsNumber)) {
                     throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);

@@ -70,3 +70,15 @@ export function getSelectedOptions(selectElement) {
 
     return selectedOptions;
 }
+
+export function getCriterionFilterParameters(criterion) {
+    return criterion.filter.values.filter(value => value.startsWith('@'));
+}
+
+export function getCriterionFilterSubQueries(criterion) {
+    return criterion.filter.values.filter(value => value.startsWith('$'));
+}
+
+export function getCriterionFilterValues(criterion) {
+    return criterion.filter.values.filter(value => ! value.startsWith('$') && ! value.startsWith('@'));
+}

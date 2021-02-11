@@ -3,36 +3,12 @@ import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { removeJoinMetadata } from "../actions/JoinActions";
 
 export const runQuery = () => {
-	const currentQueryState = store.getState().query;
-    const currentJoinState = store.getState().joins;
-
-    // Determine parent table.
-    let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
-    let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
-
-    // Build statement object
-    let statement = {
-        name: '',
-        database: currentQueryState.selectedDatabase,
-        columns: currentQueryState.selectedColumns,
-        table: parentTable,
-        criteria: replaceParentCriterionIds(currentQueryState.criteria),
-        joins: removeJoinMetadata(currentJoinState.joins),
-        distinct: currentQueryState.distinct,
-        groupBy: false,
-        orderBy: false,
-        limit: currentQueryState.limit,
-        ascending: currentQueryState.ascending,
-        offset: currentQueryState.offset,
-        suppressNulls: currentQueryState.suppressNulls
-    };
-
+	let statement = buildSelectStatement();
     console.log(statement);
-
     console.log(JSON.stringify(statement));
 
     // Send query to API.
-    let apiUrl = `${store.getState().config.baseApiUrl}/data/${currentQueryState.selectedDatabase.databaseName}/query`;
+    let apiUrl = `${store.getState().config.baseApiUrl}/data/${store.getState().query.selectedDatabase.databaseName}/query`;
     fetch(apiUrl, {
         method: 'POST',
         body: JSON.stringify(statement),
@@ -62,4 +38,64 @@ export const runQuery = () => {
         alert(reason)
     });
 };
+
+export const saveQuery = () => {
+    let statement = buildSelectStatement();
+    console.log(statement);
+    console.log(JSON.stringify(statement));
+
+    // Send query to API.
+    let apiUrl = `${store.getState().config.baseApiUrl}/query-template`;
+    fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify(statement),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(async response => {
+        if (response.ok) {
+            alert('Query saved successfully!');
+        } else {
+            const data = await response.json();
+            if (data.hasOwnProperty('message')) {
+                throw Error(data.message)
+            } else {
+                throw Error('An error occurred when running the query')
+            }
+        }
+    }).catch(reason => {
+        alert(reason)
+    });
+};
+
+const buildSelectStatement = () => {
+    const currentQueryState = store.getState().query;
+    const currentJoinState = store.getState().joins;
+
+    // Determine parent table.
+    let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
+    let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
+
+    // Build statement object
+    let statement = {
+        name: currentQueryState.name,
+        discoverable: currentQueryState.discoverable,
+        description: currentQueryState.description,
+        parameters: currentQueryState.parameters,
+        database: currentQueryState.selectedDatabase,
+        columns: currentQueryState.selectedColumns,
+        table: parentTable,
+        criteria: replaceParentCriterionIds(currentQueryState.criteria),
+        joins: removeJoinMetadata(currentJoinState.joins),
+        distinct: currentQueryState.distinct,
+        groupBy: false,
+        orderBy: false,
+        limit: currentQueryState.limit,
+        ascending: currentQueryState.ascending,
+        offset: currentQueryState.offset,
+        suppressNulls: currentQueryState.suppressNulls
+    };
+
+    return statement;
+}
 

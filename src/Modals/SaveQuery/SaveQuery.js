@@ -10,6 +10,7 @@ import { flattenCriteria } from "../../actions/CriteriaActions";
 import * as Utils from '../../Utils/Utils';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import { saveQuery } from "../../actions/QueryActions";
 
 class SaveQuery extends Component {
 	
@@ -72,19 +73,19 @@ class SaveQuery extends Component {
 		        	<Form>
 		        		<Form.Group controlId="saveQuery.name">
 		        			<Form.Label>Name</Form.Label>
-		        			<Form.Control as="input" placeholder="Enter the Query's Name"></Form.Control>
+		        			<Form.Control as="input" placeholder="Enter the Query's Name" onChange={(event) => this.props.onQueryMetadataChangeHandler('name', event)}></Form.Control>
 		        		</Form.Group>
 
 		        		<Form.Label>Discoverable?  </Form.Label>
 		        		<br/>
-		        		<ToggleButtonGroup type="radio" name="discoverable" defaultValue="false" onChange={this.props.onToggleDiscoverable}>
+		        		<ToggleButtonGroup type="radio" name="discoverable" defaultValue="false" onChange={(value) => this.props.onToggleDiscoverableHandler('discoverable', value)}>
 		        			<ToggleButton value="false" variant="outline-primary"> No</ToggleButton>
 		        			<ToggleButton value="true" variant="outline-primary"> Yes</ToggleButton>
 		        		</ToggleButtonGroup>
 
 		        		<Form.Group controlId="saveQuery.description">
 		        			<Form.Label>Description</Form.Label>
-		        			<Form.Control as="textarea" rows={5}></Form.Control>
+		        			<Form.Control as="textarea" rows={5} onChange={(event) => this.props.onQueryMetadataChangeHandler('description', event)}></Form.Control>
 		        		</Form.Group>
 		        		
 		        		{parametersTableJsx}
@@ -95,7 +96,7 @@ class SaveQuery extends Component {
 		          <Button variant="outline-secondary" onClick={this.props.onCloseHandler}>
 		            Close
 		          </Button>
-		          <Button variant="outline-primary">
+		          <Button variant="outline-primary" onClick={saveQuery}>
 		            Save
 		          </Button>
 		        </Modal.Footer>
@@ -123,20 +124,25 @@ const mapDispatchToProps = (dispatch) => {
     			}
     		});
     	},
-    	onToggleDiscoverable: (value) => {
+    	onToggleDiscoverableHandler: (attribute, value) => {
     		let isDiscoverable = value.toLowerCase() === 'true';
 
     		dispatch({
-    			type: 'TOGGLE_DISCOVERABLE',
+    			type: 'UPDATE_QUERY_METADATA',
     			payload: {
-    				discoverable: isDiscoverable
+    				attribute: attribute,
+    				value: isDiscoverable
     			}
     		});
     	},
-    	onSaveHandler: () => {
+    	onQueryMetadataChangeHandler: (attribute, event) => {
     		dispatch({
-    			type: 'U'
-    		})
+    			type: 'UPDATE_QUERY_METADATA',
+    			payload: {
+    				attribute: attribute, 
+    				value: event.target.value
+    			}
+    		});
     	}
     }
 };

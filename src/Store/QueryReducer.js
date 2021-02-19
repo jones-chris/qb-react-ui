@@ -1,8 +1,12 @@
 const initialState = {
-    name: '',
-    discoverable: false,
-    description: '',
-    parameters: [],
+    metadata: {
+        name: '',
+        description: '',
+        version: 0,
+        author: '',
+        isDiscoverable: false,
+        parameters: [],
+    },
     availableDatabases: [],
     selectedDatabase: null,
     availableSchemas: [],
@@ -78,7 +82,7 @@ const queryReducer = (state = initialState, action) => {
             let attributeNameToUpdate = action.payload.attribute;
             let value = action.payload.value;
 
-            newState[attributeNameToUpdate] = value;
+            newState.metadata[attributeNameToUpdate] = value;
             return newState;
         default:
             return state;

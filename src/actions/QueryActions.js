@@ -1,6 +1,7 @@
 import {store} from "../index";
 import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { removeJoinMetadata } from "../actions/JoinActions";
+import * as Utils from "../Utils/Utils"; 
 
 export const runQuery = () => {
 	let statement = buildSelectStatement();
@@ -76,12 +77,13 @@ const buildSelectStatement = () => {
     let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
     let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
 
+    // // Build the metadata's criteria parameters.
+    // let metadata = currentQueryState.metadata;
+    // metadata.parameters = buildSelectStatementCriteriaParameters();
+
     // Build statement object
     let statement = {
-        name: currentQueryState.name,
-        discoverable: currentQueryState.discoverable,
-        description: currentQueryState.description,
-        parameters: currentQueryState.parameters,
+        metadata: currentQueryState.metadata,
         database: currentQueryState.selectedDatabase,
         columns: currentQueryState.selectedColumns,
         table: parentTable,
@@ -97,5 +99,29 @@ const buildSelectStatement = () => {
     };
 
     return statement;
-}
+};
+
+// const buildSelectStatementCriteriaParameters = () => {
+//     let criteriaParameters = [];
+
+//     const currentQueryState = store.getState().query;
+//     currentQueryState.criteria.forEach(criterion => {
+//         let parameterPlaceholders = Utils.getCriterionFilterParameters(criterion);
+
+//         parameterPlaceholders.forEach(parameterPlaceholder => {
+//             let allowMulitpleValues = (criterion.operator === 'in' || criterion.operator === 'notIn') ? 'true' : 'false';
+//             let dataTypeInteger = criterion.column.dataType;
+//             let dataTypeString = Utils.getJdbcSqlType(criterion.column.dataType);
+
+//             criteriaParameters.push({
+//                 name: parameterPlaceholder.substring(1), // Cut off the "@".
+//                 allowMulitpleValues: allowMulitpleValues,
+//                 jdbcDataType: dataTypeInteger,
+//                 dataTypeName: dataTypeString
+//             })
+//         });
+//     })
+
+//     return criteriaParameters;
+// };
 

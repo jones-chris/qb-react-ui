@@ -35,7 +35,7 @@ class SaveQuery extends Component {
 			parameters.forEach(parameter => {
 				parametersJsx.push(
 					<tr>
-						<td>{parameter}</td>
+						<td>{parameter.substring(1)}</td>
 						<td>{allowMulitpleValues}</td>
 						<td>{dataTypeString}</td>
 					</tr>
@@ -78,7 +78,7 @@ class SaveQuery extends Component {
 
 		        		<Form.Label>Discoverable?  </Form.Label>
 		        		<br/>
-		        		<ToggleButtonGroup type="radio" name="discoverable" defaultValue="false" onChange={(value) => this.props.onToggleDiscoverableHandler('discoverable', value)}>
+		        		<ToggleButtonGroup type="radio" name="discoverable" defaultValue="false" onChange={(value) => this.props.onToggleDiscoverableHandler('isDiscoverable', value)}>
 		        			<ToggleButton value="false" variant="outline-primary"> No</ToggleButton>
 		        			<ToggleButton value="true" variant="outline-primary"> Yes</ToggleButton>
 		        		</ToggleButtonGroup>

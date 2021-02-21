@@ -2,7 +2,8 @@ import {store} from "../index";
 
 const initialState = {
     hideColumnMembersModal: true,
-    columnValueModal: null
+    columnValueModal: null,
+    hideSaveQueryModal: true
 };
 
 const modalReducer = (state = initialState, action) => {
@@ -10,6 +11,12 @@ const modalReducer = (state = initialState, action) => {
     let newState = JSON.parse(JSON.stringify(state));
 
     switch (action.type) {
+        case 'SHOW_SAVE_QUERY_MODAL':
+            newState.hideSaveQueryModal = action.payload.hide;
+            return newState;
+        case 'HIDE_SAVE_QUERY_MODAL':
+            newState.hideSaveQueryModal = action.payload.hide;
+            return newState;
         case 'SHOW_COLUMN_VALUES_MODAL':
             // Create Column Values initial state.
             let initialColumnValuesModalState = {

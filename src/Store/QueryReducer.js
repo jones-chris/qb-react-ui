@@ -1,4 +1,12 @@
 const initialState = {
+    metadata: {
+        name: '',
+        description: '',
+        version: 0,
+        author: '',
+        isDiscoverable: false,
+        parameters: [],
+    },
     availableDatabases: [],
     selectedDatabase: null,
     availableSchemas: [],
@@ -17,87 +25,65 @@ const initialState = {
 };
 
 const queryReducer = (state = initialState, action) => {
+    let newState = {...state};
+
     switch (action.type) {
         case 'UPDATE_AVAILABLE_DATABASES':
-            return {
-                ...state,
-                availableDatabases: action.payload.availableDatabases
-            };
+            newState.availableDatabases = action.payload.availableDatabases;
+            return newState;
         case 'CHANGE_SELECTED_DATABASE':
-            return {
-                ...initialState,
-                availableDatabases: state.availableDatabases,
-                selectedDatabase: action.payload.selectedDatabase
-            };
+            newState.availableDatabases = state.availableDatabases;
+            newState.selectedDatabase = action.payload.selectedDatabase;
+            return newState;
         case 'UPDATE_AVAILABLE_SCHEMAS':
-            return {
-                ...state,
-                availableSchemas:  action.payload.availableSchemas
-            };
+            newState.availableSchemas = action.payload.availableSchemas;
+            return newState;
         case 'SELECT_SCHEMA':
-            return {
-                ...state,
-                selectedSchemas: action.payload.selectedSchemas,
-                availableTables: action.payload.tables
-            };
+            newState.selectedSchemas = action.payload.selectedSchemas;
+            newState.availableTables = action.payload.tables;
+            return newState;
         case 'SELECT_TABLE':
-            return {
-                ...state,
-                selectedTables: action.payload.selectedTables,
-                availableColumns: action.payload.availableColumns
-            };
+            newState.selectedTables = action.payload.selectedTables;
+            newState.availableColumns = action.payload.availableColumns;
+            return newState;
         case 'ADD_SELECTED_COLUMN':
-            return {
-                ...state,
-                selectedColumns: action.payload.selectedColumns
-            };
+            newState.selectedColumns = action.payload.selectedColumns;
+            return newState;
         case 'REMOVE_SELECTED_COLUMN':
-            return {
-                ...state,
-                selectedColumns: action.payload.selectedColumns
-            };
+            newState.selectedColumns = action.payload.selectedColumns;
+            return newState;
         case 'UPDATE_DISTINCT':
-            return {
-                ...state,
-                distinct: ! state.distinct
-            };
+            newState.distinct = ! state.distinct;
+            return newState;
         case 'UPDATE_SUPPRESS_NULLS':
-            return {
-                ...state,
-                suppressNulls: ! state.suppressNulls
-            };
+            newState.suppressNulls = ! state.suppressNulls;
+            return newState;
         case 'UPDATE_LIMIT':
-            return {
-                ...state,
-                limit: action.payload.newLimit
-            };
+            newState.limit = action.payload.newLimit;
+            return newState;
         case 'UPDATE_OFFSET':
-            return {
-                ...state,
-                offset: action.payload.newOffset
-            };
+            newState.offset = action.payload.newOffset;
+            return newState;
         case 'ADD_CRITERIA':
-            return {
-                ...state,
-                criteria: action.payload.newCriteria
-            };
+            newState.criteria = action.payload.newCriteria;
+            return newState;
         case 'UPDATE_CRITERIA':
-            return {
-                ...state,
-                criteria: action.payload.newCriteria
-            };
+            newState.criteria = action.payload.newCriteria;
+            return newState;
         case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
-            return {
-                ...state,
-                criteria: action.payload.newCriteria
-            };
+            newState.criteria = action.payload.newCriteria;
+            return newState;
         case 'IMPORT_QUERY_TEMPLATE':
             let queryTemplate = action.payload.queryTemplate;
 
-            return {
-                ...state,
-                selectedColumns: queryTemplate.columns //todo:  finish this once qb4j lib's data models are corrected to match web app and front end.
-            };
+            newState.selectedColumns = queryTemplate.columns; //todo:  finish this once qb4j lib's data models are corrected to match web app and front end. 
+            return newState;
+        case 'UPDATE_QUERY_METADATA':
+            let attributeNameToUpdate = action.payload.attribute;
+            let value = action.payload.value;
+
+            newState.metadata[attributeNameToUpdate] = value;
+            return newState;
         default:
             return state;
     }

@@ -25,9 +25,7 @@ export const addCriterion = (parentCriterion) => {
         column: column,
         operator: 'equalTo',
         filter: {
-            values: [],
-            subQueries: [],
-            parameters: []
+            values: []
         },
         childCriteria: [],
         metadata: {
@@ -69,14 +67,7 @@ export const updateCriterion = (criterion, criterionObjectAttributeName, value) 
                     thisCriterion[Constants.FILTER].values = [];
                 } else {
                     const splitValues = value.split(',');
-
-                    const subQueries = splitValues.filter(value => value.startsWith('$'));
-                    const parameters = splitValues.filter(value => value.startsWith('@'));
-                    const values = splitValues.filter(value => ! value.startsWith('$') && ! value.startsWith('@'));
-
-                    thisCriterion[Constants.FILTER].subQueries = subQueries;
-                    thisCriterion[Constants.FILTER].parameters = parameters;
-                    thisCriterion[Constants.FILTER].values = values;
+                    thisCriterion[Constants.FILTER].values = splitValues;
                 }
             } else {
                 // Otherwise, just assign the value to the attribute.

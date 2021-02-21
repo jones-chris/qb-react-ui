@@ -7,8 +7,9 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
-import { replaceParentCriterionIds } from "../actions/CriteriaActions";
-import { removeJoinMetadata } from "../actions/JoinActions";
+// import { replaceParentCriterionIds } from "../actions/CriteriaActions";
+import { runQuery } from "../actions/QueryActions";
+// import { removeJoinMetadata } from "../actions/JoinActions";
 import { assertAllValidations } from "../Validators/Validators";
 
 
@@ -45,64 +46,7 @@ class MenuBar extends Component {
             }
         }
 
-        const currentQueryState = store.getState().query;
-        const currentJoinState = store.getState().joins;
-
-        // Determine parent table.
-        let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
-        let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
-
-        // Build statement object
-        let statement = {
-            name: '',
-            database: currentQueryState.selectedDatabase,
-            columns: currentQueryState.selectedColumns,
-            table: parentTable,
-            criteria: replaceParentCriterionIds(currentQueryState.criteria),
-            joins: removeJoinMetadata(currentJoinState.joins),
-            distinct: currentQueryState.distinct,
-            groupBy: false,
-            orderBy: false,
-            limit: currentQueryState.limit,
-            ascending: currentQueryState.ascending,
-            offset: currentQueryState.offset,
-            suppressNulls: currentQueryState.suppressNulls
-        };
-
-        console.log(statement);
-
-        console.log(JSON.stringify(statement));
-
-        // Send query to API.
-        let apiUrl = `${store.getState().config.baseApiUrl}/data/${currentQueryState.selectedDatabase.databaseName}/query`;
-        fetch(apiUrl, {
-            method: 'POST',
-            body: JSON.stringify(statement),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(async response => {
-            const data = await response.json();
-
-            if (! response.ok) {
-                if (data.hasOwnProperty('message')) {
-                    throw Error(data.message)
-                } else {
-                    throw Error('An error occurred when running the query')
-                }
-            }
-
-            return data;
-        }).then(json => {
-            console.log(json);
-
-            // Send json to window's parent so the parent can choose what to do with the data.
-            let parentWindow = store.getState().config.parentWindow;
-            let parentWindowUrl = store.getState().config.parentWindowUrl;
-            parentWindow.postMessage(json, parentWindowUrl);
-        }).catch(reason => {
-            alert(reason)
-        });
+        runQuery();
     };
 
     render() {
@@ -159,12 +103,18 @@ class MenuBar extends Component {
                         </Nav.Link>
                     </Nav>
 
-                    <Button className="btn btn-outline-primary my-2 my-sm-0"
+                    <Button className="mr-1"
+                            variant="outline-primary"
                             onClick={this.onRunQueryHandler}
                     >
                         Run Query
                     </Button>
 
+                    <Button variant="outline-secondary"
+                            onClick={this.props.onSaveQueryHandler}
+                    >
+                        Save Query
+                    </Button>
                 </Navbar.Collapse>
             </Navbar>
         );
@@ -180,6 +130,14 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        onSaveQueryHandler: () => {
+            dispatch({
+                type: 'SHOW_SAVE_QUERY_MODAL',
+                payload: {
+                    hide: false
+                }
+            });
+        },
         toggleJoinsVisibility: () => dispatch({ type: Constants.JOINS }),
         toggleSchemasAndTablesVisibility: () => dispatch({ type: Constants.SCHEMAS_AND_TABLES }),
         toggleQueryTemplatesVisibility: () => dispatch({ type: Constants.QUERY_TEMPLATES }),

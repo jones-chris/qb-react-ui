@@ -100,28 +100,3 @@ const buildSelectStatement = () => {
 
     return statement;
 };
-
-// const buildSelectStatementCriteriaParameters = () => {
-//     let criteriaParameters = [];
-
-//     const currentQueryState = store.getState().query;
-//     currentQueryState.criteria.forEach(criterion => {
-//         let parameterPlaceholders = Utils.getCriterionFilterParameters(criterion);
-
-//         parameterPlaceholders.forEach(parameterPlaceholder => {
-//             let allowMulitpleValues = (criterion.operator === 'in' || criterion.operator === 'notIn') ? 'true' : 'false';
-//             let dataTypeInteger = criterion.column.dataType;
-//             let dataTypeString = Utils.getJdbcSqlType(criterion.column.dataType);
-
-//             criteriaParameters.push({
-//                 name: parameterPlaceholder.substring(1), // Cut off the "@".
-//                 allowMulitpleValues: allowMulitpleValues,
-//                 jdbcDataType: dataTypeInteger,
-//                 dataTypeName: dataTypeString
-//             })
-//         });
-//     })
-
-//     return criteriaParameters;
-// };
-

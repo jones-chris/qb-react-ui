@@ -23,7 +23,6 @@ class SaveQuery extends Component {
 		let criteria = store.getState().query.criteria;
 		criteria = flattenCriteria(criteria, []);
 
-		// let parameters = criteria.filter.flatMap(criterion => criterion.filter.parameters);
 		let parametersJsx = [];
 		let parametersTableJsx = <div></div>;
 		criteria.forEach(criterion => {

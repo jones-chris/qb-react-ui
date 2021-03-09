@@ -8,6 +8,7 @@ import fullOuterJoinExcluding from "../Images/full_outer_join_excluding.png";
 
 
 // HTML section names.
+export const SUB_QUERIES = 'Sub Queries';
 export const JOINS = 'Joins';
 export const SCHEMAS_AND_TABLES = 'Schemas & Tables';
 export const COLUMNS = 'Columns';

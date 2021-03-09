@@ -36,6 +36,12 @@ const initialState = {
         uiMessages: [],
         isValid: true,
         hasUnsavedChanges: false
+    },
+    subQueries: {
+        isHidden: true,
+        uiMessages: [],
+        isValid: true,
+        hasUnsavedChanges: false
     }
 };
 
@@ -79,6 +85,10 @@ const menuBarReducer = (state = initialState, action) => {
     let newState = JSON.parse(JSON.stringify(state));
 
     switch (action.type) {
+        case Constants.SUB_QUERIES:
+            hideAllElements(newState);
+            newState.subQueries.isHidden = false;
+            return newState;
         case Constants.JOINS:
             hideAllElements(newState);
             newState.joins.isHidden = false;

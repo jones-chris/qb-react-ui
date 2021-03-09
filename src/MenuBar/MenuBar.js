@@ -73,6 +73,12 @@ class MenuBar extends Component {
                         </NavDropdown>
 
                         <Nav.Link className={this.props.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
+                                  onClick={this.props.toggleSubQueriesVisibility}
+                        >
+                            Sub Queries
+                        </Nav.Link>
+
+                        <Nav.Link className={this.props.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleSchemasAndTablesVisibility}
                         >
                             Schemas & Tables
@@ -138,6 +144,7 @@ const mapDispatchToProps = (dispatch) => {
                 }
             });
         },
+        toggleSubQueriesVisibility: () => dispatch({ type: Constants.SUB_QUERIES }),
         toggleJoinsVisibility: () => dispatch({ type: Constants.JOINS }),
         toggleSchemasAndTablesVisibility: () => dispatch({ type: Constants.SCHEMAS_AND_TABLES }),
         toggleQueryTemplatesVisibility: () => dispatch({ type: Constants.QUERY_TEMPLATES }),

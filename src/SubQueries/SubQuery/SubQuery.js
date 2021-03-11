@@ -6,6 +6,10 @@ import "./SubQuery.css";
 import Table from 'react-bootstrap/Table';
 import {assertAllValidations} from "../../Validators/Validators";
 import {getJdbcSqlType} from '../../Utils/Utils';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import chevronDown from '../../Images/chevron_down.svg';
 
 class SubQuery extends Component {
 
@@ -72,13 +76,14 @@ class SubQuery extends Component {
 				parametersAndArgumentsJsx.push(
 					<tr>
 						<td>{parameterName}</td>
-						<td>{parameter.allowsMultipleValues}</td>
+						<td>{(parameter.allowsMultipleValues) ? 'true' : 'false'}</td>
 						<td>{getJdbcSqlType(parameter.column.dataType)}</td>
 						<td>
 							<Form.Control
 								as="input"
 								size="sm"
 								value={(argument) ? argument : ''}
+								onChange={(event) => this.props.onUpdateArgument(this.props.subQuery.id, parameterName, event)}
 							>
 							</Form.Control>
 						</td>
@@ -88,76 +93,89 @@ class SubQuery extends Component {
 		}
 
 		return (
-			<Form>
-				<Form.Group>
-	    			<Table striped bordered hover>
-	    				<tbody>
-	    					<tr>
-								<td>Sub Query Name</td>
-								<td>
-									<Form.Control 
-										disabled={false}
-										readOnly={false}
-										as="input"
-										type="text"
-									    placeholder="Your name for the sub query" 
-									    size="sm" 
-									    value={this.props.subQuery.subQueryName}
-										onChange={(event) => this.props.onChangeSubQueryName(this.props.subQuery.id, 'subQueryName', event)}
-								    >
-								    </Form.Control>
-								</td>
-							</tr>
+			<Card>
+				<Card.Header>
+					<Accordion.Toggle as={Button} variant="link" eventKey={this.props.subQuery.id.toString()}> 
+						<img src={chevronDown}
+						     className="hover-pointer"
+						></img>
+					</Accordion.Toggle>
+				</Card.Header>
+				<Accordion.Collapse eventKey={this.props.subQuery.id.toString()}>
+					<Card.Body>
+						<Form>
+							<Form.Group>
+				    			<Table striped bordered hover>
+				    				<tbody>
+				    					<tr>
+											<td>Sub Query Name</td>
+											<td>
+												<Form.Control 
+													disabled={false}
+													readOnly={false}
+													as="input"
+													type="text"
+												    placeholder="Your name for the sub query" 
+												    size="sm" 
+												    value={this.props.subQuery.subQueryName}
+													onChange={(event) => this.props.onChangeSubQueryName(this.props.subQuery.id, 'subQueryName', event)}
+											    >
+											    </Form.Control>
+											</td>
+										</tr>
 
-	    					<tr>
-								<td>Query Template</td>
-								<td>
-									<Form.Control 
-								    	as="select" 
-										size="sm"
-										onChange={(event) => this.props.onChangeQueryTemplateName(this.props.subQuery.id, 'queryTemplateName', event)}
-								    >
-										{queryTemplateNamesOptionsJsx}
-									</Form.Control>
-								</td>
-							</tr>
+				    					<tr>
+											<td>Query Template</td>
+											<td>
+												<Form.Control 
+											    	as="select" 
+													size="sm"
+													onChange={(event) => this.props.onChangeQueryTemplateName(this.props.subQuery.id, 'queryTemplateName', event)}
+											    >
+													{queryTemplateNamesOptionsJsx}
+												</Form.Control>
+											</td>
+										</tr>
 
-							<tr>
-								<td>Version</td>
-								<td>
-									<Form.Control 
-										as="select" 
-										size="sm"
-										onChange={(event) => this.props.onChangeVersion(this.props.subQuery.id, 'version', event)}
-								    >	
-								    	{versionsOptionsJsx}
-									</Form.Control>
-								</td>
-								
-							</tr>
-	    				</tbody>
-	    			</Table>
-	    		</Form.Group>
+										<tr>
+											<td>Version</td>
+											<td>
+												<Form.Control 
+													as="select" 
+													size="sm"
+													onChange={(event) => this.props.onChangeVersion(this.props.subQuery.id, 'version', event)}
+											    >	
+											    	{versionsOptionsJsx}
+												</Form.Control>
+											</td>
+											
+										</tr>
+				    				</tbody>
+				    			</Table>
+				    		</Form.Group>
 
-	    		{
-					parametersAndArgumentsJsx.length > 0 &&
-					<Form.Group controlId="subQuery.parameters">
-	        			<Table striped bordered hover>
-	        				<thead>
-	        					<tr>
-	        						<th>Parameter</th>
-	        						<th>Allows Multiple Values</th>
-	        						<th>Data Type</th>
-	        						<th>Argument</th>
-	        					</tr>
-	        				</thead>
-	        				<tbody>
-	        					{parametersAndArgumentsJsx}
-	        				</tbody>
-	        			</Table>
-	        		</Form.Group>
-				}
-	    	</Form>
+				    		{
+								parametersAndArgumentsJsx.length > 0 &&
+								<Form.Group controlId="subQuery.parameters">
+				        			<Table striped bordered hover>
+				        				<thead>
+				        					<tr>
+				        						<th>Parameter</th>
+				        						<th>Allows Multiple Values</th>
+				        						<th>Data Type</th>
+				        						<th>Argument</th>
+				        					</tr>
+				        				</thead>
+				        				<tbody>
+				        					{parametersAndArgumentsJsx}
+				        				</tbody>
+				        			</Table>
+				        		</Form.Group>
+							}
+				    	</Form>
+					</Card.Body>
+				</Accordion.Collapse>
+			</Card>
 		);
 	}
 
@@ -196,13 +214,8 @@ const mapDispatchToProps = (dispatch) => {
             });
     	},
     	onChangeQueryTemplateName: async (subQueryId, attributeName, event) => {
-    		// dispatch(updateSubQuery(subQueryId, attributeName, event.target.value));
-
-    		// dispatch(updateVersions(subQueryId));
-
     		let newSubQueries = [...store.getState().query.subQueries];
 
-    		// todo:  Consider ways to not have to loop through all sub queries multiple times thoughout this function.
     		let newQueryTemplateName = event.target.value;
     		if (newQueryTemplateName === '') {
     			console.error('newQueryTemplateName is an empty string');
@@ -276,18 +289,7 @@ const mapDispatchToProps = (dispatch) => {
 	                .then(metadata => {
 	                    console.log(metadata);
 
-	                    // Update the available sub query cache.
 	                    availableSubQueryVersion.metadata = metadata;
-
-	                    // // Update the sub query's parameters by merging all arguments from existing parameters into the new sub query parameters. 
-	                   	// let parametersCopy = [...metadata.parameters];
-	                   	// parametersCopy.forEach(parameter => {
-	                   	// 	if (subQuery.parametersAndArguments.hasOwnProperty(parameter.name)) {
-	                   	// 		parametersCopy[parameter.name] = subQuery.parametersAndArguments[parameter.name];
-	                   	// 	}
-	                   	// })
-
-	                    // subQuery.parametersAndArguments = parametersCopy;
 	                });
     		}
 
@@ -299,6 +301,27 @@ const mapDispatchToProps = (dispatch) => {
     		});
 
 			dispatch({
+    			type: 'UPDATE_SUBQUERIES',
+    			payload: {
+    				subQueries: newSubQueries
+    			}
+			});
+
+    		dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+    	},
+    	onUpdateArgument: (subQueryId, parameterName, event) => {
+    		let newSubQueries = [...store.getState().query.subQueries];
+
+			let argument = event.target.value;
+    		let subQuery = newSubQueries.filter(subQuery => subQuery.id === subQueryId)[0];
+    		subQuery.parametersAndArguments[parameterName] = argument;
+
+    		dispatch({
     			type: 'UPDATE_SUBQUERIES',
     			payload: {
     				subQueries: newSubQueries

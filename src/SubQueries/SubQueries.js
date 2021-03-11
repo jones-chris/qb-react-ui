@@ -5,6 +5,7 @@ import SubQuery from "./SubQuery/SubQuery";
 import Button from "react-bootstrap/Button";
 import {assertAllValidations} from "../Validators/Validators";
 import "./SubQueries.css";
+import Accordion from 'react-bootstrap/Accordion';
 
 class SubQueries extends Component {
 
@@ -30,7 +31,9 @@ class SubQueries extends Component {
 		            Add Sub Query
 		        </Button>
 
-		        {subQueriesJsx}
+		        <Accordion>
+		        	{subQueriesJsx}
+		        </Accordion>
 
             </div>
         );

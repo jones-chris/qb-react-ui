@@ -77,9 +77,16 @@ const buildSelectStatement = () => {
     let targetJoinTables = currentQueryState.joins.map(join => join.targetTable.fullyQualifiedName);
     let parentTable = currentQueryState.selectedTables.find(table => ! targetJoinTables.includes(table.fullyQualifiedName));
 
-    // // Build the metadata's criteria parameters.
-    // let metadata = currentQueryState.metadata;
-    // metadata.parameters = buildSelectStatementCriteriaParameters();
+    // Build the common table expressions/sub queries.
+    let commonTableExpressions = [];
+    currentQueryState.subQueries.forEach(subQuery => {
+        commonTableExpressions.push({
+            name: subQuery.subQueryName,
+            queryName: subQuery.queryTemplateName,
+            parametersAndArguments: subQuery.parametersAndArguments,
+            version: subQuery.version
+        })
+    });
 
     // Build statement object
     let statement = {
@@ -95,7 +102,8 @@ const buildSelectStatement = () => {
         limit: currentQueryState.limit,
         ascending: currentQueryState.ascending,
         offset: currentQueryState.offset,
-        suppressNulls: currentQueryState.suppressNulls
+        suppressNulls: currentQueryState.suppressNulls,
+        commonTableExpressions: commonTableExpressions
     };
 
     return statement;

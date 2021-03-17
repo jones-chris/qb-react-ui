@@ -96,10 +96,24 @@ class SubQuery extends Component {
 			<Card>
 				<Card.Header>
 					<Accordion.Toggle as={Button} variant="link" eventKey={this.props.subQuery.id.toString()}> 
-						<img src={chevronDown}
-						     className="hover-pointer"
-						></img>
+						<Form.Control 
+							disabled={false}
+							readOnly={false}
+							as="input"
+							type="text"
+						    placeholder="Your name for the sub query" 
+						    size="sm" 
+						    value={this.props.subQuery.subQueryName}
+							onChange={(event) => this.props.onChangeSubQueryName(this.props.subQuery.id, 'subQueryName', event)}
+					    >
+					    </Form.Control>
 					</Accordion.Toggle>
+					<Button 
+					    variant="outline-danger"
+					    onClick={() => this.props.onDeleteSubQuery(this.props.subQuery.id)}
+				    >
+				      x
+				    </Button>
 				</Card.Header>
 				<Accordion.Collapse eventKey={this.props.subQuery.id.toString()}>
 					<Card.Body>
@@ -107,23 +121,6 @@ class SubQuery extends Component {
 							<Form.Group>
 				    			<Table striped bordered hover>
 				    				<tbody>
-				    					<tr>
-											<td>Sub Query Name</td>
-											<td>
-												<Form.Control 
-													disabled={false}
-													readOnly={false}
-													as="input"
-													type="text"
-												    placeholder="Your name for the sub query" 
-												    size="sm" 
-												    value={this.props.subQuery.subQueryName}
-													onChange={(event) => this.props.onChangeSubQueryName(this.props.subQuery.id, 'subQueryName', event)}
-											    >
-											    </Form.Control>
-											</td>
-										</tr>
-
 				    					<tr>
 											<td>Query Template</td>
 											<td>
@@ -320,6 +317,29 @@ const mapDispatchToProps = (dispatch) => {
 			let argument = event.target.value;
     		let subQuery = newSubQueries.filter(subQuery => subQuery.id === subQueryId)[0];
     		subQuery.parametersAndArguments[parameterName] = argument;
+
+    		dispatch({
+    			type: 'UPDATE_SUBQUERIES',
+    			payload: {
+    				subQueries: newSubQueries
+    			}
+			});
+
+    		dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+    	},
+    	onDeleteSubQuery: (subQueryId) => {
+    		let newSubQueries = [...store.getState().query.subQueries];
+    		newSubQueries = newSubQueries.filter(subQuery => subQuery.id !== subQueryId);
+
+    		// Renumber sub query ids.
+    		newSubQueries.forEach((subQuery, index) => {
+    			subQuery.id = index;
+    		});
 
     		dispatch({
     			type: 'UPDATE_SUBQUERIES',

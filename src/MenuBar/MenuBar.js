@@ -7,9 +7,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
-// import { replaceParentCriterionIds } from "../actions/CriteriaActions";
 import { runQuery } from "../actions/QueryActions";
-// import { removeJoinMetadata } from "../actions/JoinActions";
 import { assertAllValidations } from "../Validators/Validators";
 
 

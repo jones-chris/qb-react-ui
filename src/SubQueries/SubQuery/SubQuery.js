@@ -70,7 +70,7 @@ class SubQuery extends Component {
 				let parameterName = parameter.name;
 
 				// Get argument, if one exists.
-				let argument = this.props.subQuery.parametersAndArguments[parameterName];
+				let args = this.props.subQuery.parametersAndArguments[parameterName];
 
 				// Create JSX.
 				parametersAndArgumentsJsx.push(
@@ -82,7 +82,7 @@ class SubQuery extends Component {
 							<Form.Control
 								as="input"
 								size="sm"
-								value={(argument) ? argument : ''}
+								value={(args && args.length > 0) ? args.join(',') : ''}
 								onChange={(event) => this.props.onUpdateArgument(this.props.subQuery.id, parameterName, event)}
 							>
 							</Form.Control>
@@ -314,9 +314,9 @@ const mapDispatchToProps = (dispatch) => {
     	onUpdateArgument: (subQueryId, parameterName, event) => {
     		let newSubQueries = [...store.getState().query.subQueries];
 
-			let argument = event.target.value;
+			let args = event.target.value.split(',');
     		let subQuery = newSubQueries.filter(subQuery => subQuery.id === subQueryId)[0];
-    		subQuery.parametersAndArguments[parameterName] = argument;
+    		subQuery.parametersAndArguments[parameterName] = args;
 
     		dispatch({
     			type: 'UPDATE_SUBQUERIES',

@@ -8,10 +8,10 @@ import Columns from "./Columns/Columns";
 import OtherOptions from "./OtherOptions/OtherOptions";
 import Criteria from "./Criteria/Criteria";
 import ColumnValues from "./Modals/ColumnValues/ColumnValues";
-import QueryTemplates from "./QueryTemplates/QueryTemplates";
 import Warnings from "./Warnings/Warnings";
 import {assertAllValidations} from "./Validators/Validators";
 import SaveQuery from "./Modals/SaveQuery/SaveQuery";
+import SubQueries from "./SubQueries/SubQueries";
 
 
 class App extends React.Component {
@@ -62,8 +62,8 @@ class App extends React.Component {
                     hidden={this.props.menuBar.criteria.isHidden.toString()}
                 />
 
-                <QueryTemplates
-                    hidden={this.props.menuBar.queryTemplates.isHidden.toString()}
+                <SubQueries
+                    hidden={this.props.menuBar.subQueries.isHidden.toString()}
                 />
 
                 {/*Modals*/}

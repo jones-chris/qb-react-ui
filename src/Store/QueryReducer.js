@@ -4,8 +4,7 @@ const initialState = {
         description: '',
         version: 0,
         author: '',
-        isDiscoverable: false,
-        parameters: [],
+        isDiscoverable: false
     },
     availableDatabases: [],
     selectedDatabase: null,
@@ -21,7 +20,9 @@ const initialState = {
     suppressNulls: false,
     limit: 10,
     offset: 0,
-    ascending: false
+    ascending: false,
+    availableSubQueries: {},
+    subQueries: []
 };
 
 const queryReducer = (state = initialState, action) => {
@@ -83,6 +84,12 @@ const queryReducer = (state = initialState, action) => {
             let value = action.payload.value;
 
             newState.metadata[attributeNameToUpdate] = value;
+            return newState;
+        case 'UPDATE_AVAIALABLE_SUBQUERIES':
+            newState.availableSubQueries = action.payload.availableSubQueries;
+            return newState;
+        case 'UPDATE_SUBQUERIES':
+            newState.subQueries = action.payload.subQueries;
             return newState;
         default:
             return state;

@@ -3,10 +3,73 @@ import {UiMessage} from "../Models/UiMessage";
 import {getJdbcSqlType, BIG_INT, BOOLEAN, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT, getCriterionFilterValues} from "../Utils/Utils";
 import {flattenCriteria} from "../actions/CriteriaActions";
 
+const NUMERIC_DATA_TYPES = [BIG_INT, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT];
+
 export const assertDatabaseIsSelected = () => {
     if (store.getState().query.selectedDatabase === null) {
         throw Error('Select 1 database');
     }
+};
+
+export const assertSubQueriesAreCorrect = () => {
+    let subQueries = store.getState().query.subQueries;
+
+    // Each sub query has a name
+    subQueries.forEach(subQuery => {
+        if (subQuery.subQueryName === null || subQuery.subQueryName === '') {
+            throw Error('Each sub query must have a name');
+        }
+
+        if (subQuery.subQueryName.includes(' ')) {
+            throw Error('Please remove the whitespace from all sub query names');
+        }
+
+        // A query template is selected
+        if (subQuery.queryTemplateName === null || subQuery.queryTemplateName === '') {
+            throw Error(`Please select a query template for sub query, ${subQuery.subQueryName}`);
+        }
+
+        // A version is selected
+        if (subQuery.version === null || subQuery.version === '') {
+            throw Error(`Please select a version for sub query ${subQuery.version}`);
+        }
+
+        // Parameters and arguments are correct.
+        let parameters = store.getState().query.availableSubQueries[subQuery.queryTemplateName].versions[subQuery.version].metadata.parameters;
+        parameters.forEach(parameter => {
+            // Check the the right number of arguments exist.
+            let args = subQuery.parametersAndArguments[parameter.name];
+            if (! parameter.allowsMultipleValues) {
+                if (args && args.length > 1) {
+                    throw Error(`Parameter, ${parameter.name}, in sub query, ${subQuery.subQueryName}, does not allow multiple arguments`);
+                }
+            }
+
+            // Check that the data type is correct.
+            let jdbcDataType = getJdbcSqlType(parameter.column.dataType);
+            if (NUMERIC_DATA_TYPES.includes(jdbcDataType)) {
+                args.forEach(arg => {
+                    let valueAsNumber = Number(arg);
+                    if (isNaN(valueAsNumber)) {
+                        throw Error(`In sub query, ${subQuery.subQueryName}, the data type of parameter, ${parameter.name}, is ${jdbcDataType}, 
+                            but the argument, ${arg}, is not a(n) ${jdbcDataType}`);
+                    }
+                })
+            }
+        });
+
+        // Each sub query has a unique name.
+        let subQueryNamesSorted = subQueries.map(subQuery => subQuery.subQueryName).sort();
+        subQueryNamesSorted.forEach((subQueryName, index) => {
+            // If this is the last item in the array, continue because adding + 1 to the index in the below 'else if' block will cause an index out of bounds error.
+            if (index === subQueryNamesSorted.length - 1) {
+                return;
+            }
+            else if (subQueryName === subQueryNamesSorted[index + 1]) {
+                throw Error(`More than one sub query was found with the name, ${subQueryName}.  Each sub query name should be unique.`);
+            }
+        });
+    });
 };
 
 export const assertSchemasAreSelected = () => {
@@ -72,6 +135,9 @@ export const assertCriteriaOperatorsAreCorrect = () => {
 };
 
 export const assertCriteriaFiltersAreCorrect = () => {
+    let subQueries = store.getState().query.subQueries;
+    let availableSubQueries = store.getState().query.availableSubQueries;
+
     let criteria = store.getState().query.criteria;
     criteria = flattenCriteria(criteria, []);
     criteria.forEach(criterion => {
@@ -83,29 +149,65 @@ export const assertCriteriaFiltersAreCorrect = () => {
         });
 
         // If data type is not string, then check that the filter values can be converted to int, double, etc.
-        let jdbcDataType = getJdbcSqlType(criterion.column.dataType);
+        let criterionColumnJdbcDataType = getJdbcSqlType(criterion.column.dataType);
         let numericJdbcTypes = [BIG_INT, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, SMALL_INT, TINY_INT];
         let criterionFilterValuesExcludingParamsAndSubQueries = getCriterionFilterValues(criterion);
-        if (numericJdbcTypes.includes(jdbcDataType)) {
+        if (numericJdbcTypes.includes(criterionColumnJdbcDataType)) {
             criterionFilterValuesExcludingParamsAndSubQueries.forEach(value => {
                 let valueAsNumber = Number(value);
                 if (isNaN(valueAsNumber)) {
-                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);
+                    throw Error(`A criterion's column's data type is ${criterionColumnJdbcDataType}, but the filter value, ${value}, is not a(n) ${criterionColumnJdbcDataType}`);
                 }
             })
         }
 
         // Other non-string data type checks.
-        if (jdbcDataType === BOOLEAN) {
+        if (criterionColumnJdbcDataType === BOOLEAN) {
             criterion.filter.values.forEach(value => {
                 let lowerCaseValue = value.toString().toLowerCase();
                 if (lowerCaseValue !== 'true' && lowerCaseValue !== 'false') {
-                    throw Error(`A criterion's column's data type is ${jdbcDataType}, but the filter value, ${value}, is not a(n) ${jdbcDataType}`);
+                    throw Error(`A criterion's column's data type is ${criterionColumnJdbcDataType}, but the filter value, ${value}, is not a(n) ${criterionColumnJdbcDataType}`);
                 }
             })
         }
 
         // todo:  Add a check for dates and timestamps?
+
+        // Sub query checks.
+        criterion.filter.values.forEach(value => {
+            if (value.startsWith('$')) {
+                let subQueryName = value.substr(1);
+
+                // Check that each sub query can be found.
+                let matchingSubQuery = subQueries.find(subQuery => subQuery.subQueryName === subQueryName);
+                if (! matchingSubQuery) {
+                    throw Error(`The sub query, ${subQueryName}, does not exist`);
+                }
+
+                // Check that the sub query only returns one column.
+                let availableSubQueryMetadata = store.getState().query.availableSubQueries[matchingSubQuery.queryTemplateName].versions[matchingSubQuery.version].metadata;
+                if (availableSubQueryMetadata.numberOfColumnsReturned > 1) {
+                    throw Error(`The sub query, ${subQueryName}, should only return 1 column`);
+                }
+
+                // If the sub query could return more than 1 row, check that the operator is IN or NOT IN. 
+                if (availableSubQueryMetadata.maxNumberOfRowsReturned > 1) {
+                    if (criterion.operator.toLowerCase() !== 'in' && criterion.operator.toLowerCase() !== 'notin') {
+                        throw Error(`Sub query, ${subQueryName}, could return more than 1 row but the criterion operator is not IN or NOT IN`);
+                    }
+                }
+
+                // If the criterion's column's data type is numeric, check that the sub query data type is also numeric.
+                
+                // let onlyReturnColumns = matchingSubQuery.onlyReturnColumns; // Check that this is only 1 item in array for subqueries. 
+                let metadataColumn = availableSubQueryMetadata.columns[0];
+                let metadaColumnJdbcType = getJdbcSqlType(metadataColumn.dataType);
+                if (NUMERIC_DATA_TYPES.includes(criterionColumnJdbcDataType) && ! NUMERIC_DATA_TYPES.includes(metadaColumnJdbcType)) {
+                    throw Error(`The column, ${criterion.column.fullyQualifiedName}, is a(n) ${criterionColumnJdbcDataType}, but the sub query column, 
+                        ${metadataColumn.fullyQualifiedName}, is a(n) ${metadaColumnJdbcType}`)
+                }
+            }
+        });
     })
 }
 
@@ -116,6 +218,12 @@ export const assertAllValidations = () => {
         assertTablesAreSelected();
     } catch (e) {
         return new UiMessage('schemasAndTables', e.message);
+    }
+
+    try {
+        assertSubQueriesAreCorrect();
+    } catch (e) {
+        return new UiMessage('subQueries', e.message);
     }
 
     try {

@@ -200,9 +200,16 @@ const mapDispatchToProps = (dispatch) => {
 
                 newSubQueries.forEach(subQuery => {
                     if (subQuery.id === targetObjectId) {
-                        // set parameter args here.
+                        subQuery.parametersAndArguments[target.parameterName] = selectedColumnValues;
                     }
                 })
+                
+                dispatch({
+                    type: 'UPDATE_SUBQUERY_PARAMETER_COLUMN_VALUES',
+                    payload: {
+                        newSubQueries: newSubQueries
+                    }
+                });
             }
 
             // Dispatch action to close Column Values modal.
@@ -247,16 +254,14 @@ const mapDispatchToProps = (dispatch) => {
             })
         },
         onNextPage: () => {
-            // Create a string with the schema names joined together with `&` to be used in API call.
-            let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
-
             let columnValueModalState = store.getState().modal.columnValueModal;
             let column = columnValueModalState.target.column;
+            let databaseName = column.databaseName;
+            let schemaName = column.schemaName;
             let tableName = column.tableName;
             let columnName = column.columnName;
 
-            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${databaseName}/${schemaName}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${columnValueModalState.offset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.
@@ -297,18 +302,16 @@ const mapDispatchToProps = (dispatch) => {
                 })
         },
         onPriorPage: () => {
-            // Create a string with the schema names joined together with `&` to be used in API call.
-            let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
-
             let columnValueModalState = store.getState().modal.columnValueModal;
             let column = columnValueModalState.target.column;
+            let databaseName = column.databaseName;
+            let schemaName = column.schemaName;
             let tableName = column.tableName;
             let columnName = column.columnName;
 
             let newOffset = columnValueModalState.offset - columnValueModalState.limit;
 
-            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${databaseName}/${schemaName}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${newOffset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.

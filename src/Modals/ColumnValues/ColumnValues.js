@@ -171,28 +171,39 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onSubmitColumnValues: () => {
             // Get object ref and attribute to update.
-            let targetObjectRef = store.getState().modal.columnValueModal.target.object;
-            let targetAttribute = store.getState().modal.columnValueModal.target.attribute;
-
-            // Copy the query state's criteria.
-            let newCriteria = [ ...store.getState().query.criteria ];
+            let target = store.getState().modal.columnValueModal.target;
+            let targetObjectId = target.objectId;
 
             // Get the selected column values that will become the value of the target object ref and target attribute.
             let selectedColumnValues = store.getState().modal.columnValueModal.selectedColumnValues;
 
-            newCriteria.forEach(criterion => {
-                if (_.isEqual(criterion, targetObjectRef)) {
-                    criterion[targetAttribute] = selectedColumnValues.join(',');
-                }
-            });
+            if (target.type === 'CRITERIA') {
+                // Copy the query state's criteria.
+                let newCriteria = [...store.getState().query.criteria];
 
-            // Dispatch action to update criteria.
-            dispatch({
-                type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
-                payload: {
-                    newCriteria: newCriteria
-                }
-            });
+                newCriteria.forEach(criterion => {
+                    if (criterion.metadata.id === targetObjectId) {
+                        criterion.filter.values = selectedColumnValues;
+                    }
+                });
+
+                // Dispatch action to update criteria.
+                dispatch({
+                    type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
+                    payload: {
+                        newCriteria: newCriteria
+                    }
+                });
+            }
+            else if (target.type === 'SUBQUERY') {
+                let newSubQueries = [...store.getState().query.subQueries];
+
+                newSubQueries.forEach(subQuery => {
+                    if (subQuery.id === targetObjectId) {
+                        // set parameter args here.
+                    }
+                })
+            }
 
             // Dispatch action to close Column Values modal.
             dispatch({
@@ -240,7 +251,7 @@ const mapDispatchToProps = (dispatch) => {
             let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
 
             let columnValueModalState = store.getState().modal.columnValueModal;
-            let column = columnValueModalState.target.object.column;
+            let column = columnValueModalState.target.column;
             let tableName = column.tableName;
             let columnName = column.columnName;
 
@@ -290,7 +301,7 @@ const mapDispatchToProps = (dispatch) => {
             let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
 
             let columnValueModalState = store.getState().modal.columnValueModal;
-            let column = columnValueModalState.target.object.column;
+            let column = columnValueModalState.target.column;
             let tableName = column.tableName;
             let columnName = column.columnName;
 

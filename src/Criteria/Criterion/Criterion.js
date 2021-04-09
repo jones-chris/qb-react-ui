@@ -92,7 +92,7 @@ class Criterion extends React.Component {
                 <input type="button"
                        value="Column Values"
                        className="criteria-add-remove-buttons"
-                       onClick={() => this.props.onShowColumnValuesModal(criterion, 'filter')}
+                       onClick={() => this.props.onShowColumnValuesModal(criterion.metadata.id, criterion.column, 'CRITERIA')}
                 />
             </div>
         );
@@ -151,14 +151,15 @@ const mapDispatchToProps = (dispatch) => {
                 }
             });
         },
-        onShowColumnValuesModal: (targetObject, targetAttribute) => {
+        onShowColumnValuesModal: (objectId, column, type) => {
             dispatch({
                 type: 'SHOW_COLUMN_VALUES_MODAL',
                 payload: {
                     hide: false,
                     target: {
-                        object: targetObject,
-                        attribute: targetAttribute
+                        column: column,
+                        type: type, // 'CRITERIA | SUBQUERY' // -> use this in a switch block in the onSubmit modal method to get the store's criteria or subqueries.
+                        objectId: objectId
                     }
                 }
             });

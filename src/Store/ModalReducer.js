@@ -20,12 +20,7 @@ const modalReducer = (state = initialState, action) => {
         case 'SHOW_COLUMN_VALUES_MODAL':
             // Create Column Values initial state.
             let initialColumnValuesModalState = {
-                target: {
-                    // The target object, which is passed by reference - so if the object is updated here, it will be updated in the `query` state.
-                    object: action.payload.target.object,
-                    // the target object attribute to update.
-                    attribute: action.payload.target.attribute
-                },
+                target: action.payload.target,
                 id: 0,  // There will only be 1 Column Values modal and state at a time.
                 offset: 0,
                 limit: 2,

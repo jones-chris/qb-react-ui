@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import * as Utils from "../../Utils/Utils";
 import _ from 'lodash';
 import {assertAllValidations} from "../../Validators/Validators";
+import {flattenCriteria} from "../../actions/CriteriaActions";
 
 class ColumnValues extends React.Component {
 
@@ -181,7 +182,8 @@ const mapDispatchToProps = (dispatch) => {
                 // Copy the query state's criteria.
                 let newCriteria = [...store.getState().query.criteria];
 
-                newCriteria.forEach(criterion => {
+                let flattenedCriteria = flattenCriteria(newCriteria, []);
+                flattenedCriteria.forEach(criterion => {
                     if (criterion.metadata.id === targetObjectId) {
                         criterion.filter.values = selectedColumnValues;
                     }

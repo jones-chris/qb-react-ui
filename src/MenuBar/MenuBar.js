@@ -70,37 +70,37 @@ class MenuBar extends Component {
                             {availableDatabases}
                         </NavDropdown>
 
-                        <Nav.Link className={this.props.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleSubQueriesVisibility}
                         >
                             Sub Queries
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.schemasAndTables.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleSchemasAndTablesVisibility}
                         >
                             Schemas & Tables
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.joins.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.joins.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleJoinsVisibility}
                         >
                             Joins
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.columns.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.columns.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleColumnsVisibility}
                         >
                             Columns
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.criteria.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.criteria.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleCriteriaVisibility}
                         >
                             Criteria
                         </Nav.Link>
 
-                        <Nav.Link className={this.props.otherOptions.isVisible ? "nav-item active" : "nav-item"}
+                        <Nav.Link className={this.props.menuBar.otherOptions.isVisible ? "nav-item active" : "nav-item"}
                                   onClick={this.props.toggleOtherOptionsVisibility}
                         >
                             Other Options
@@ -126,10 +126,7 @@ class MenuBar extends Component {
 }
 
 const mapReduxStateToProps = (reduxState) => {
-    return {
-        ...reduxState.menuBar,
-        ...reduxState.query
-    }
+    return reduxState
 };
 
 const mapDispatchToProps = (dispatch) => {

@@ -10,6 +10,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import chevronDown from '../../Images/chevron_down.svg';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 class SubQuery extends Component {
 
@@ -79,13 +80,24 @@ class SubQuery extends Component {
 						<td>{(parameter.allowsMultipleValues) ? 'true' : 'false'}</td>
 						<td>{getJdbcSqlType(parameter.column.dataType)}</td>
 						<td>
-							<Form.Control
-								as="input"
-								size="sm"
-								value={(args && args.length > 0) ? args.join(',') : ''}
-								onChange={(event) => this.props.onUpdateArgument(this.props.subQuery.id, parameterName, event)}
-							>
-							</Form.Control>
+							<InputGroup className="mb-3">
+								<Form.Control
+									as="input"
+									size="sm"
+									value={(args && args.length > 0) ? args.join(',') : ''}
+									onChange={(event) => this.props.onUpdateArgument(this.props.subQuery.id, parameterName, event)}
+								>
+								</Form.Control>
+								<InputGroup.Append>
+									<InputGroup.Text
+										id="basic-addon2"
+										className="hover-pointer"
+										onClick={() => this.props.onShowColumnValuesModal(this.props.subQuery.id, parameter.column, 'SUBQUERY', parameterName)}
+									>
+										Values
+									</InputGroup.Text>
+								</InputGroup.Append>
+							</InputGroup>
 						</td>
 					</tr>
 				);
@@ -186,6 +198,27 @@ const mapReduxStateToProps = (reduxState) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+    	onShowColumnValuesModal: (objectId, column, type, parameterName) => {
+            dispatch({
+                type: 'SHOW_COLUMN_VALUES_MODAL',
+                payload: {
+                    hide: false,
+                    target: {
+                        column: column,
+                        type: type, // 'CRITERIA | SUBQUERY' // -> use this in a switch block in the onSubmit modal method to get the store's criteria or subqueries.
+                        objectId: objectId,
+                        parameterName: parameterName
+                    }
+                }
+            });
+
+            dispatch({
+                type: 'UPDATE_UI_MESSAGES',
+                payload: {
+                    uiMessages: assertAllValidations()
+                }
+            });
+        },
     	onChangeSubQueryName: (subQueryId, attributeName, event) => {
     		let newSubQueries = [...store.getState().query.subQueries];
 

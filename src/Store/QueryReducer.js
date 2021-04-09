@@ -74,6 +74,9 @@ const queryReducer = (state = initialState, action) => {
         case 'UPDATE_COLUMN_VALUES_MODAL_TARGET':
             newState.criteria = action.payload.newCriteria;
             return newState;
+        case 'UPDATE_SUBQUERY_PARAMETER_COLUMN_VALUES':
+            newState.subQueries = action.payload.newSubQueries;
+            return newState;
         case 'IMPORT_QUERY_TEMPLATE':
             let queryTemplate = action.payload.queryTemplate;
 

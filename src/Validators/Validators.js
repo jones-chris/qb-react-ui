@@ -46,15 +46,17 @@ export const assertSubQueriesAreCorrect = () => {
             }
 
             // Check that the data type is correct.
-            let jdbcDataType = getJdbcSqlType(parameter.column.dataType);
-            if (NUMERIC_DATA_TYPES.includes(jdbcDataType)) {
-                args.forEach(arg => {
-                    let valueAsNumber = Number(arg);
-                    if (isNaN(valueAsNumber)) {
-                        throw Error(`In sub query, ${subQuery.subQueryName}, the data type of parameter, ${parameter.name}, is ${jdbcDataType}, 
-                            but the argument, ${arg}, is not a(n) ${jdbcDataType}`);
-                    }
-                })
+            if (args && args.length > 1) {
+                let jdbcDataType = getJdbcSqlType(parameter.column.dataType);
+                if (NUMERIC_DATA_TYPES.includes(jdbcDataType)) {
+                    args.forEach(arg => {
+                        let valueAsNumber = Number(arg);
+                        if (isNaN(valueAsNumber)) {
+                            throw Error(`In sub query, ${subQuery.subQueryName}, the data type of parameter, ${parameter.name}, is ${jdbcDataType}, 
+                                but the argument, ${arg}, is not a(n) ${jdbcDataType}`);
+                        }
+                    })
+                }
             }
         });
 

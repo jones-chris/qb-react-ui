@@ -112,6 +112,10 @@
     padding-right: 10px;
 }
 
+.hover-pointer {
+    cursor: pointer;
+}
+
 /*.warning {*/
 /*    color: red;*/
 /*}*/

@@ -171,28 +171,46 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onSubmitColumnValues: () => {
             // Get object ref and attribute to update.
-            let targetObjectRef = store.getState().modal.columnValueModal.target.object;
-            let targetAttribute = store.getState().modal.columnValueModal.target.attribute;
-
-            // Copy the query state's criteria.
-            let newCriteria = [ ...store.getState().query.criteria ];
+            let target = store.getState().modal.columnValueModal.target;
+            let targetObjectId = target.objectId;
 
             // Get the selected column values that will become the value of the target object ref and target attribute.
             let selectedColumnValues = store.getState().modal.columnValueModal.selectedColumnValues;
 
-            newCriteria.forEach(criterion => {
-                if (_.isEqual(criterion, targetObjectRef)) {
-                    criterion[targetAttribute] = selectedColumnValues.join(',');
-                }
-            });
+            if (target.type === 'CRITERIA') {
+                // Copy the query state's criteria.
+                let newCriteria = [...store.getState().query.criteria];
 
-            // Dispatch action to update criteria.
-            dispatch({
-                type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
-                payload: {
-                    newCriteria: newCriteria
-                }
-            });
+                newCriteria.forEach(criterion => {
+                    if (criterion.metadata.id === targetObjectId) {
+                        criterion.filter.values = selectedColumnValues;
+                    }
+                });
+
+                // Dispatch action to update criteria.
+                dispatch({
+                    type: 'UPDATE_COLUMN_VALUES_MODAL_TARGET',
+                    payload: {
+                        newCriteria: newCriteria
+                    }
+                });
+            }
+            else if (target.type === 'SUBQUERY') {
+                let newSubQueries = [...store.getState().query.subQueries];
+
+                newSubQueries.forEach(subQuery => {
+                    if (subQuery.id === targetObjectId) {
+                        subQuery.parametersAndArguments[target.parameterName] = selectedColumnValues;
+                    }
+                })
+                
+                dispatch({
+                    type: 'UPDATE_SUBQUERY_PARAMETER_COLUMN_VALUES',
+                    payload: {
+                        newSubQueries: newSubQueries
+                    }
+                });
+            }
 
             // Dispatch action to close Column Values modal.
             dispatch({
@@ -236,16 +254,14 @@ const mapDispatchToProps = (dispatch) => {
             })
         },
         onNextPage: () => {
-            // Create a string with the schema names joined together with `&` to be used in API call.
-            let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
-
             let columnValueModalState = store.getState().modal.columnValueModal;
-            let column = columnValueModalState.target.object.column;
+            let column = columnValueModalState.target.column;
+            let databaseName = column.databaseName;
+            let schemaName = column.schemaName;
             let tableName = column.tableName;
             let columnName = column.columnName;
 
-            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${databaseName}/${schemaName}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${columnValueModalState.offset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.
@@ -286,18 +302,16 @@ const mapDispatchToProps = (dispatch) => {
                 })
         },
         onPriorPage: () => {
-            // Create a string with the schema names joined together with `&` to be used in API call.
-            let joinedSchemaString = store.getState().query.selectedSchemas.map(schema => schema.schemaName).join('&');
-
             let columnValueModalState = store.getState().modal.columnValueModal;
-            let column = columnValueModalState.target.object.column;
+            let column = columnValueModalState.target.column;
+            let databaseName = column.databaseName;
+            let schemaName = column.schemaName;
             let tableName = column.tableName;
             let columnName = column.columnName;
 
             let newOffset = columnValueModalState.offset - columnValueModalState.limit;
 
-            let selectedDatabaseName = store.getState().query.selectedDatabase.databaseName;
-            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${selectedDatabaseName}/${joinedSchemaString}/${tableName}/${columnName}/column-member`;
+            let baseApiUrl = `${store.getState().config.baseApiUrl}/data/${databaseName}/${schemaName}/${tableName}/${columnName}/column-member`;
             let queryParams = `?limit=${columnValueModalState.limit}&offset=${newOffset}&ascending=${columnValueModalState.ascending}`;
 
             // Concatenate the search text if it exists.
